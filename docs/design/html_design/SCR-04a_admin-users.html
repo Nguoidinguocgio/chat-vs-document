@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCR-04a · Quản trị — Người dùng</title>
+<style>
+:root{--bg-subtle:#F8FAFC;--text:#0F172A;--muted:#475569;--border:#CBD5E1;--border-strong:#64748B;--primary:#1D4ED8;--primary-hover:#1E40AF;--primary-bg:#EFF6FF;--success:#15803D;--success-bg:#F0FDF4;--warning:#B45309;--warning-bg:#FFFBEB;--danger:#B91C1C;--danger-bg:#FEF2F2;--r-sm:4px;--r-md:8px;--r-lg:12px;--e1:0 1px 2px rgba(15,23,42,.08);--e2:0 4px 12px rgba(15,23,42,.12);--e3:0 12px 32px rgba(15,23,42,.18);--font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;font:14px/20px var(--font);color:var(--text);background:var(--bg-subtle)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.top{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#fff;border-bottom:1px solid var(--border)}
+.top a.back{color:var(--primary);text-decoration:none;font-weight:500;padding:6px 8px;border-radius:var(--r-md)}.top a.back:hover{background:var(--primary-bg)}
+.top h1{margin:0;font-size:18px;line-height:28px;font-weight:600}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 80px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tabs a{padding:10px 14px;text-decoration:none;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current=page]{color:var(--primary);border-color:var(--primary);font-weight:600}
+.bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.bar .grow{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff;font-weight:500}
+.btn:hover:not(:disabled){background:var(--bg-subtle)}.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn-primary:hover:not(:disabled){background:var(--primary-hover)}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}.btn-danger:hover:not(:disabled){background:#991B1B}
+.input,select.input{height:36px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff;width:100%}
+.input[aria-invalid=true]{border-color:var(--danger)}
+.search{max-width:300px;flex:1}
+.tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--e1)}
+.tbl th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--bg-subtle);padding:10px 14px;border-bottom:1px solid var(--border)}
+.tbl td{padding:12px 14px;border-bottom:1px solid #E2E8F0;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.off td{color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;line-height:16px;white-space:nowrap}
+.b-ok{background:var(--success-bg);color:var(--success)}.b-wait{background:var(--warning-bg);color:var(--warning)}.b-off{background:#E2E8F0;color:var(--muted)}
+.b-role{background:var(--primary-bg);color:var(--primary)}
+.menu-wrap{position:relative;text-align:right}
+.icon-btn{width:32px;height:32px;border:0;border-radius:var(--r-md);background:transparent;font-size:16px}.icon-btn:hover{background:#E2E8F0}
+.menu{position:absolute;right:0;top:34px;min-width:200px;background:#fff;border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--e2);padding:4px;z-index:10;text-align:left}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:var(--r-sm)}.menu button:hover{background:var(--bg-subtle)}.menu .dg{color:var(--danger)}
+.empty{padding:32px;text-align:center;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:var(--r-lg)}
+.cards{display:none}
+dialog{border:0;border-radius:var(--r-lg);padding:0;box-shadow:var(--e3);max-width:min(460px,calc(100vw - 32px));width:100%}
+dialog::backdrop{background:rgba(15,23,42,.45)}
+.dh{padding:16px 20px 0;margin:0;font-size:18px;line-height:28px;font-weight:600}
+.db{padding:8px 20px 16px;display:grid;gap:12px;color:var(--muted)}
+.df{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border)}
+.field{display:grid;gap:6px;color:var(--text)}.field label{font-weight:600}
+.err{color:var(--danger);font-size:13px}
+.secret{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid #FCD34D;background:var(--warning-bg);border-radius:var(--r-md);color:var(--text)}
+.secret code{flex:1;font:600 16px/24px ui-monospace,Consolas,monospace;letter-spacing:.04em;user-select:all}
+.warn{color:#78350F;font-size:13px}
+.toasts{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:90}
+.toast{background:#0F172A;color:#fff;padding:10px 14px;border-radius:var(--r-md);box-shadow:var(--e2)}
+@media (max-width:760px){
+ .tbl{display:none}.cards{display:grid;gap:10px}
+ .card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 14px;display:grid;gap:6px;position:relative}
+ .card .menu-wrap{position:absolute;right:8px;top:8px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="SCR-03_workspace-chat.html">← Quay lại workspace</a>
+  <h1>Quản trị</h1>
+</header>
+<main class="wrap">
+  <nav class="tabs" aria-label="Quản trị">
+    <a href="SCR-04a_admin-users.html" aria-current="page">Người dùng</a>
+    <a href="SCR-04b_admin-audit.html">Nhật ký kiểm toán</a>
+  </nav>
+
+  <div class="bar">
+    <button class="btn btn-primary" id="btnNew">＋ Tạo tài khoản</button>
+    <div class="grow"></div>
+    <label class="sr-only" for="q">Tìm theo email</label>
+    <input class="input search" id="q" type="search" placeholder="🔍 Tìm theo email">
+  </div>
+  <p class="sr-only" id="live" aria-live="polite"></p>
+
+  <table class="tbl" id="tbl"><thead><tr><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập gần nhất</th><th><span class="sr-only">Thao tác</span></th></tr></thead><tbody id="rows"></tbody></table>
+  <div class="cards" id="cards"></div>
+  <div class="empty" id="empty" hidden>Không có người dùng nào khớp “<span id="eq"></span>”.</div>
+</main>
+
+<dialog id="dNew">
+  <form id="fNew" novalidate>
+    <h2 class="dh">Tạo tài khoản</h2>
+    <div class="db">
+      <div class="field"><label for="nEmail">Email</label><input class="input" id="nEmail" type="email" placeholder="ten@congty.vn" aria-describedby="eEmail"><div class="err" id="eEmail" hidden></div></div>
+      <div class="field"><label for="nRole">Vai trò</label><select class="input" id="nRole"><option value="Member">Member</option><option value="Trưởng nhóm">Trưởng nhóm</option><option value="Admin">Admin</option></select></div>
+      <span>Hệ thống tạo mật khẩu tạm; người dùng phải đổi khi đăng nhập lần đầu.</span>
+    </div>
+    <div class="df"><button type="button" class="btn" id="nCancel">Hủy</button><button class="btn btn-primary">Tạo</button></div>
+  </form>
+</dialog>
+
+<dialog id="dSecret">
+  <h2 class="dh" id="sT">Mật khẩu tạm</h2>
+  <div class="db">
+    <span id="sD"></span>
+    <div class="secret"><code id="sPw"></code><button class="btn" id="sCopy">Sao chép</button></div>
+    <div class="warn">⚠ Mật khẩu chỉ hiển thị <b>một lần</b>. Hãy gửi cho người dùng qua kênh an toàn trước khi đóng.</div>
+  </div>
+  <div class="df"><button class="btn btn-primary" id="sClose">Đã sao chép / Đóng</button></div>
+</dialog>
+
+<dialog id="dConf"><h2 class="dh" id="cT"></h2><div class="db" id="cB"></div><div class="df"><button class="btn" id="cNo">Hủy</button><button class="btn" id="cYes">OK</button></div></dialog>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+function h(tag,props={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(props||{})){if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v===true)e.setAttribute(k,'');else if(v!==false&&v!=null)e.setAttribute(k,v)}for(const c of kids.flat(9)){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c))}return e}
+let users=[
+ {e:'admin@congty.vn',r:'Admin',s:'active',l:'Hôm nay 08:15'},
+ {e:'lan@congty.vn',r:'Member',s:'active',l:'Hôm nay 09:02'},
+ {e:'minh@congty.vn',r:'Trưởng nhóm',s:'active',l:'Hôm qua 17:40'},
+ {e:'hoa@congty.vn',r:'Member',s:'pending',l:'—'},
+ {e:'nam@congty.vn',r:'Member',s:'disabled',l:'12/10/2026 10:20'}];
+const SL={active:['b-ok','✓ Hoạt động'],pending:['b-wait','⏳ Chờ đổi mật khẩu'],disabled:['b-off','⛔ Vô hiệu hóa']};
+function toast(t){const x=h('div',{class:'toast'},t);$('#toasts').append(x);setTimeout(()=>x.remove(),4000)}
+function tempPw(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';return Array.from(crypto.getRandomValues(new Uint32Array(12)),n=>c[n%c.length]).join('')}
+function conf({title,body,ok,danger}){return new Promise(res=>{$('#cT').textContent=title;$('#cB').textContent=body;const y=$('#cYes');y.textContent=ok;y.className='btn '+(danger?'btn-danger':'btn-primary');y.onclick=()=>{$('#dConf').close();res(true)};$('#cNo').onclick=()=>{$('#dConf').close();res(false)};$('#dConf').oncancel=()=>res(false);$('#dConf').showModal()})}
+function secret(title,desc,pw){$('#sT').textContent=title;$('#sD').textContent=desc;$('#sPw').textContent=pw;$('#dSecret').showModal()}
+$('#sCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#sPw').textContent);toast('Đã sao chép mật khẩu tạm')}catch(e){toast('Không sao chép tự động được — hãy bôi đen và sao chép thủ công')}};
+$('#sClose').onclick=()=>{$('#sPw').textContent='';$('#dSecret').close()};
+$('#dSecret').addEventListener('cancel',e=>e.preventDefault()); // buộc bấm nút để chủ động xác nhận đã lưu mật khẩu
+function act(u,a){
+ document.querySelectorAll('.menu').forEach(m=>m.remove());
+ if(a==='reset')return conf({title:'Đặt lại mật khẩu?',body:`Tạo mật khẩu tạm mới cho ${u.e}. Mật khẩu cũ sẽ không còn dùng được.`,ok:'Đặt lại'}).then(ok=>{if(ok){u.s='pending';render();secret('Mật khẩu tạm mới','Dành cho '+u.e,tempPw())}});
+ if(a==='disable')return conf({title:'Vô hiệu hóa tài khoản?',body:`${u.e} sẽ bị đăng xuất trong vòng 60 giây và không đăng nhập được nữa. Tài liệu họ đã tải lên vẫn được giữ lại trong workspace.`,ok:'Vô hiệu hóa',danger:true}).then(ok=>{if(ok){u.s='disabled';render();toast('Đã vô hiệu hóa '+u.e)}});
+ if(a==='enable'){u.s='active';render();toast('Đã kích hoạt lại '+u.e)}
+}
+function menu(u,btn){
+ const had=btn.parentElement.querySelector('.menu');document.querySelectorAll('.menu').forEach(m=>m.remove());if(had)return;
+ const self=u.e==='admin@congty.vn';
+ btn.parentElement.append(h('div',{class:'menu',role:'menu'},
+  h('button',{role:'menuitem',onclick:()=>act(u,'reset')},'🔑 Đặt lại mật khẩu'),
+  u.s==='disabled'?h('button',{role:'menuitem',onclick:()=>act(u,'enable')},'✓ Kích hoạt lại'):h('button',{role:'menuitem',class:'dg',disabled:self,title:self?'Bạn không thể tự vô hiệu hóa tài khoản của mình':null,onclick:()=>act(u,'disable')},'⛔ Vô hiệu hóa')));
+}
+function mbtn(u){const w=h('div',{class:'menu-wrap'});w.append(h('button',{class:'icon-btn','aria-label':'Thao tác với '+u.e,'aria-haspopup':'menu',onclick:e=>{e.stopPropagation();menu(u,e.currentTarget)}},'⋯'));return w}
+function badge(u){const[c,t]=SL[u.s];return h('span',{class:'badge '+c},t)}
+function render(){
+ const q=$('#q').value.trim().toLowerCase(),list=users.filter(u=>u.e.includes(q));
+ $('#rows').replaceChildren(...list.map(u=>h('tr',{class:u.s==='disabled'?'off':''},h('td',{},u.e),h('td',{},h('span',{class:'badge b-role'},u.r)),h('td',{},badge(u)),h('td',{},u.l),h('td',{},mbtn(u)))));
+ $('#cards').replaceChildren(...list.map(u=>h('div',{class:'card'},h('b',{},u.e),h('div',{},h('span',{class:'badge b-role'},u.r),' ',badge(u)),h('span',{style:'color:var(--muted)'},'Đăng nhập gần nhất: '+u.l),mbtn(u))));
+ $('#empty').hidden=list.length>0;$('#eq').textContent=$('#q').value;$('#tbl').hidden=!list.length;
+ $('#live').textContent=list.length+' người dùng';
+}
+$('#q').oninput=render;
+document.addEventListener('click',()=>document.querySelectorAll('.menu').forEach(m=>m.remove()));
+$('#btnNew').onclick=()=>{$('#nEmail').value='';err('');$('#dNew').showModal();$('#nEmail').focus()};
+$('#nCancel').onclick=()=>$('#dNew').close();
+function err(m){const e=$('#eEmail');e.hidden=!m;e.textContent=m;$('#nEmail').setAttribute('aria-invalid',!!m)}
+$('#fNew').onsubmit=e=>{
+ e.preventDefault();const em=$('#nEmail').value.trim().toLowerCase();
+ if(!/^\S+@\S+\.\S+$/.test(em))return err('Email chưa đúng định dạng.');
+ if(users.some(u=>u.e===em))return err('Email đã được sử dụng');
+ users.push({e:em,r:$('#nRole').value,s:'pending',l:'—'});$('#dNew').close();render();
+ secret('Tài khoản đã được tạo','Mật khẩu tạm cho '+em,tempPw());
+};
+render();
+</script>
+</body>
+</html>

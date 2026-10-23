@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCR-04b · Quản trị — Nhật ký kiểm toán</title>
+<style>
+:root{--bg-subtle:#F8FAFC;--text:#0F172A;--muted:#475569;--border:#CBD5E1;--border-strong:#64748B;--primary:#1D4ED8;--primary-bg:#EFF6FF;--success:#15803D;--success-bg:#F0FDF4;--warning:#B45309;--warning-bg:#FFFBEB;--danger:#B91C1C;--danger-bg:#FEF2F2;--r-md:8px;--r-lg:12px;--e1:0 1px 2px rgba(15,23,42,.08);--font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;font:14px/20px var(--font);color:var(--text);background:var(--bg-subtle)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+[hidden]{display:none!important}
+.top{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#fff;border-bottom:1px solid var(--border)}
+.top a.back{color:var(--primary);text-decoration:none;font-weight:500;padding:6px 8px;border-radius:var(--r-md)}.top a.back:hover{background:var(--primary-bg)}
+.top h1{margin:0;font-size:18px;line-height:28px;font-weight:600}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 80px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tabs a{padding:10px 14px;text-decoration:none;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current=page]{color:var(--primary);border-color:var(--primary);font-weight:600}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 14px}
+.filters label{display:grid;gap:4px;font-weight:600;font-size:13px}
+.input{height:36px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff;min-width:150px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff;font-weight:500;cursor:pointer}.btn:hover{background:var(--bg-subtle)}
+.note{color:var(--muted);font-size:13px;margin:0 0 12px;display:flex;gap:6px}
+.tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--e1)}
+.tbl th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--bg-subtle);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:10px 14px;border-bottom:1px solid #E2E8F0;vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl time{white-space:nowrap;color:var(--muted)}
+.badge{display:inline-flex;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;line-height:16px;white-space:nowrap}
+.ok{background:var(--success-bg);color:var(--success)}.fail{background:var(--danger-bg);color:var(--danger)}
+.empty{padding:40px 16px;text-align:center;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);display:grid;gap:10px;justify-items:center}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted)}
+.tblwrap{overflow-x:auto}
+.tblwrap .tbl{min-width:680px}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="SCR-03_workspace-chat.html">← Quay lại workspace</a>
+  <h1>Quản trị</h1>
+</header>
+<main class="wrap">
+  <nav class="tabs" aria-label="Quản trị">
+    <a href="SCR-04a_admin-users.html">Người dùng</a>
+    <a href="SCR-04b_admin-audit.html" aria-current="page">Nhật ký kiểm toán</a>
+  </nav>
+
+  <form class="filters" id="f" aria-label="Bộ lọc nhật ký">
+    <label>Người dùng<select class="input" id="fu"><option value="">Tất cả</option></select></label>
+    <label>Loại thao tác<select class="input" id="fa"><option value="">Tất cả</option><option>Đăng nhập</option><option>Tài khoản</option><option>Tài liệu</option></select></label>
+    <label>Từ ngày<input class="input" id="from" type="date"></label>
+    <label>Đến ngày<input class="input" id="to" type="date"></label>
+    <button type="button" class="btn" id="clear">Xóa bộ lọc</button>
+  </form>
+  <p class="note"><span aria-hidden="true">ⓘ</span>Nhật ký chỉ đọc: không sửa hay xóa được qua giao diện, lưu tối thiểu 1 năm. Không chứa nội dung câu hỏi hoặc tài liệu.</p>
+  <p class="sr-only" id="live" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden"></p>
+
+  <div class="tblwrap" id="tw"><table class="tbl"><thead><tr><th>Thời điểm</th><th>Người thực hiện</th><th>Thao tác</th><th>Đối tượng</th><th>Kết quả</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <div class="empty" id="empty" hidden><span style="font-size:32px" aria-hidden="true">🔎</span><b>Không có bản ghi phù hợp bộ lọc</b><button class="btn" id="clear2">Xóa bộ lọc</button></div>
+  <div class="pager"><span id="count"></span><span>Hiển thị tối đa 50 bản ghi mới nhất</span></div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+function h(tag,props={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(props||{})){if(k==='class')e.className=v;else v!=null&&v!==false&&e.setAttribute(k,v)}for(const c of kids.flat(9)){if(c!=null)e.append(c.nodeType?c:document.createTextNode(c))}return e}
+const L=[
+ ['2026-10-23 09:02','lan@congty.vn','Tải lên tài liệu','HopDong_A.pdf','ok','Tài liệu'],
+ ['2026-10-23 08:15','admin@congty.vn','Đăng nhập','—','ok','Đăng nhập'],
+ ['2026-10-22 17:40','minh@congty.vn','Đăng nhập','—','ok','Đăng nhập'],
+ ['2026-10-22 17:41','minh@congty.vn','Tải lên tài liệu','PhuLuc_gia.pdf','ok','Tài liệu'],
+ ['2026-10-22 14:05','lan@congty.vn','Xóa tài liệu','BaoGia_cu.pdf','ok','Tài liệu'],
+ ['2026-10-22 10:12','hoa@congty.vn','Đăng nhập','—','fail','Đăng nhập'],
+ ['2026-10-22 10:11','hoa@congty.vn','Đăng nhập','—','fail','Đăng nhập'],
+ ['2026-10-21 16:30','admin@congty.vn','Tạo tài khoản','hoa@congty.vn','ok','Tài khoản'],
+ ['2026-10-12 10:22','admin@congty.vn','Vô hiệu hóa tài khoản','nam@congty.vn','ok','Tài khoản'],
+ ['2026-10-12 10:20','nam@congty.vn','Tải lên tài liệu','Scan_01.pdf','fail','Tài liệu'],
+ ['2026-10-11 09:00','admin@congty.vn','Đặt lại mật khẩu','minh@congty.vn','ok','Tài khoản']];
+[...new Set(L.map(r=>r[1]))].sort().forEach(u=>$('#fu').append(h('option',{},u)));
+function render(){
+ const u=$('#fu').value,a=$('#fa').value,f=$('#from').value,t=$('#to').value;
+ const rows=L.filter(r=>(!u||r[1]===u)&&(!a||r[5]===a)&&(!f||r[0].slice(0,10)>=f)&&(!t||r[0].slice(0,10)<=t));
+ $('#rows').replaceChildren(...rows.map(r=>{const[d,tm]=r[0].split(' ');const[y,m,dd]=d.split('-');return h('tr',{},h('td',{},h('time',{datetime:d+'T'+tm},`${dd}/${m}/${y} ${tm}`)),h('td',{},r[1]),h('td',{},r[2]),h('td',{},r[3]),h('td',{},h('span',{class:'badge '+r[4]},r[4]==='ok'?'✓ Thành công':'✕ Thất bại')))}));
+ $('#tw').hidden=!rows.length;$('#empty').hidden=rows.length>0;
+ $('#count').textContent=rows.length+' bản ghi';$('#live').textContent=rows.length+' bản ghi phù hợp';
+}
+function clear(){['fu','fa','from','to'].forEach(i=>$('#'+i).value='');render()}
+['fu','fa','from','to'].forEach(i=>$('#'+i).addEventListener('change',render));
+$('#clear').onclick=clear;$('#clear2').onclick=clear;
+render();
+</script>
+</body>
+</html>

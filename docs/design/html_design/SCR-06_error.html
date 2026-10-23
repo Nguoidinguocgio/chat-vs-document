@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCR-06 · Lỗi 403 / 404 / 500</title>
+<style>
+:root{--bg-subtle:#F8FAFC;--text:#0F172A;--muted:#475569;--border:#CBD5E1;--border-strong:#64748B;--primary:#1D4ED8;--primary-hover:#1E40AF;--primary-bg:#EFF6FF;--r-md:8px;--r-lg:12px;--e2:0 4px 12px rgba(15,23,42,.12);--font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px 16px;font:14px/20px var(--font);color:var(--text);background:var(--bg-subtle)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+main{max-width:460px;text-align:center;display:grid;gap:12px;justify-items:center}
+.ill{width:96px;height:96px;border-radius:24px;background:var(--primary-bg);display:grid;place-items:center;font-size:44px}
+.code{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.08em}
+h1{margin:0;font-size:24px;line-height:32px;font-weight:600}
+p{margin:0;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff;font:inherit;font-weight:600;color:var(--text);text-decoration:none;cursor:pointer}
+.btn:hover{background:var(--bg-subtle)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.primary:hover{background:var(--primary-hover)}
+.demo{position:fixed;left:12px;bottom:12px;background:#fff;border:1px dashed var(--border-strong);border-radius:var(--r-lg);padding:8px 12px;font-size:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;box-shadow:var(--e2)}
+.demo a{padding:3px 8px;border:1px solid var(--border-strong);border-radius:6px;color:var(--text);text-decoration:none}
+</style>
+</head>
+<body>
+<main role="main">
+  <div class="ill" id="ill" aria-hidden="true"></div>
+  <span class="code" id="code"></span>
+  <h1 id="ttl"></h1>
+  <p id="msg"></p>
+  <div class="row" id="row"></div>
+</main>
+<nav class="demo" aria-label="Demo"><b>Demo:</b><a href="?code=403">403</a><a href="?code=404">404</a><a href="?code=500">500</a></nav>
+<script>
+const C={
+ '403':{i:'🔒',t:'Bạn không có quyền truy cập trang này',m:'Chức năng này chỉ dành cho Admin hoặc Trưởng nhóm. Nếu bạn cần quyền truy cập, hãy liên hệ Admin.',b:[['Về trang chat','SCR-03_workspace-chat.html',1]]},
+ '404':{i:'🔎',t:'Không tìm thấy trang hoặc hội thoại',m:'Đường dẫn có thể đã sai, hoặc hội thoại đã bị xóa (hội thoại tự xóa sau 90 ngày không hoạt động).',b:[['Về trang chat','SCR-03_workspace-chat.html',1]]},
+ '500':{i:'⚠️',t:'Đã có lỗi xảy ra',m:'Vui lòng thử lại. Nếu lỗi vẫn tiếp diễn, hãy báo cho Admin kèm thời điểm xảy ra lỗi.',b:[['Tải lại trang','#reload',1],['Về trang chat','SCR-03_workspace-chat.html',0]]}};
+const code=new URLSearchParams(location.search).get('code');const c=C[code]||C['404'];const k=C[code]?code:'404';
+document.title='SCR-06 · Lỗi '+k;
+document.getElementById('ill').textContent=c.i;document.getElementById('code').textContent='MÃ LỖI '+k;
+document.getElementById('ttl').textContent=c.t;document.getElementById('msg').textContent=c.m;
+c.b.forEach(([l,h,p])=>{const a=document.createElement('a');a.className='btn'+(p?' primary':'');a.textContent=l;a.href=h==='#reload'?'#':h;if(h==='#reload')a.onclick=e=>{e.preventDefault();location.reload()};document.getElementById('row').append(a)});
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mục lục thiết kế màn hình</title>
+<style>
+:root{--text:#0F172A;--muted:#475569;--border:#CBD5E1;--primary:#1D4ED8;--primary-bg:#EFF6FF;--font:Inter,"Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}html{color-scheme:light}
+body{margin:0;font:14px/20px var(--font);color:var(--text);background:#F8FAFC}
+main{max-width:860px;margin:0 auto;padding:32px 16px}
+h1{margin:0 0 4px;font-size:24px;line-height:32px}p.s{margin:0 0 24px;color:var(--muted)}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+a.c{display:grid;grid-template-columns:84px 1fr;gap:4px 14px;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:#fff;text-decoration:none;color:inherit}
+a.c:hover{border-color:var(--primary);background:var(--primary-bg)}a.c:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.id{font-weight:700;color:var(--primary)}.t{font-weight:600}.d{grid-column:2;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Thiết kế màn hình — Chat với tài liệu (MVP)</h1>
+  <p class="s">Prototype HTML tĩnh theo <a href="../SDD_UIUX_Blueprint.md">SDD_UIUX_Blueprint.md</a>. Mỗi màn hình là một file độc lập; dữ liệu là dữ liệu mẫu. Có nút “Demo” để chuyển trạng thái khi review.</p>
+  <ul>
+    <li><a class="c" href="SCR-01_login.html"><span class="id">SCR-01</span><span class="t">Đăng nhập</span><span class="d">Lỗi sai thông tin / khóa / vô hiệu hóa / hết phiên. Email chứa “temp” → bắt đổi mật khẩu.</span></a></li>
+    <li><a class="c" href="SCR-02_change-password.html?mode=required"><span class="id">SCR-02</span><span class="t">Bắt buộc đổi mật khẩu</span><span class="d">Chính sách ≥ 10 ký tự, có chữ và số, kiểm tra trực tiếp. Thêm <code>?mode=change</code> cho chế độ tự đổi.</span></a></li>
+    <li><a class="c" href="SCR-03_workspace-chat.html"><span class="id">SCR-03</span><span class="t">Workspace — Chat (màn hình chính)</span><span class="d">Hỏi đáp streaming, trích dẫn, xem nguồn, tải lên, danh sách tài liệu, lịch sử hội thoại; mọi trạng thái trống/lỗi/gián đoạn.</span></a></li>
+    <li><a class="c" href="SCR-04a_admin-users.html"><span class="id">SCR-04a</span><span class="t">Quản trị — Người dùng</span><span class="d">Tạo tài khoản (mật khẩu tạm hiển thị một lần), đặt lại mật khẩu, vô hiệu hóa/kích hoạt lại.</span></a></li>
+    <li><a class="c" href="SCR-04b_admin-audit.html"><span class="id">SCR-04b</span><span class="t">Quản trị — Nhật ký kiểm toán</span><span class="d">Bộ lọc theo người dùng, loại thao tác, khoảng thời gian; trạng thái không có kết quả.</span></a></li>
+    <li><a class="c" href="SCR-05_reports.html"><span class="id">SCR-05</span><span class="t">Báo cáo tuần</span><span class="d">6 chỉ số so với mục tiêu OKR, biểu đồ 12 tuần kèm bảng, tuần không có dữ liệu.</span></a></li>
+    <li><a class="c" href="SCR-06_error.html?code=403"><span class="id">SCR-06</span><span class="t">Lỗi 403 / 404 / 500</span><span class="d">Dùng <code>?code=403|404|500</code>.</span></a></li>
+  </ul>
+</main>
+</body>
+</html>

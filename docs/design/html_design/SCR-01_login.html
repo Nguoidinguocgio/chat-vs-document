@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCR-01 · Đăng nhập</title>
+<style>
+:root{--bg:#fff;--bg-subtle:#F8FAFC;--text:#0F172A;--muted:#475569;--border:#CBD5E1;--border-strong:#64748B;--primary:#1D4ED8;--primary-hover:#1E40AF;--primary-bg:#EFF6FF;--success:#15803D;--warning:#B45309;--warning-bg:#FFFBEB;--danger:#B91C1C;--danger-bg:#FEF2F2;--r-md:8px;--r-lg:12px;--e2:0 4px 12px rgba(15,23,42,.12);--e3:0 12px 32px rgba(15,23,42,.18);--font:Inter,"Segoe UI",system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px 16px;font:14px/20px var(--font);color:var(--text);background:var(--bg-subtle)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+[hidden]{display:none!important}
+.card{width:100%;max-width:400px;background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e2);padding:32px 28px}
+.brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:24px;text-align:center}
+.brand h1{margin:0;font-size:24px;line-height:32px;font-weight:600}
+.brand p{margin:0;color:var(--muted)}
+form{display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field label{font-weight:600}
+.input{height:40px;width:100%;padding:0 12px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:#fff}
+.input[aria-invalid=true]{border-color:var(--danger)}
+.pw{position:relative}
+.pw .input{padding-right:44px}
+.pw button{position:absolute;right:4px;top:4px;width:32px;height:32px;border:0;background:transparent;border-radius:var(--r-md);cursor:pointer}
+.pw button:hover{background:#E2E8F0}
+.err{color:var(--danger);font-size:13px}
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:var(--r-md);border:1px solid;font-size:14px}
+.alert.danger{background:var(--danger-bg);border-color:#FCA5A5;color:#7F1D1D}
+.alert.warn{background:var(--warning-bg);border-color:#FCD34D;color:#78350F}
+.alert.info{background:var(--primary-bg);border-color:#93C5FD;color:#1E3A8A}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid var(--primary);border-radius:var(--r-md);background:var(--primary);color:#fff;font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--primary-hover)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.foot{margin-top:16px;text-align:center;color:var(--muted);font-size:13px}
+.demo{position:fixed;left:12px;bottom:12px;max-width:calc(100vw - 24px);background:#fff;border:1px dashed var(--border-strong);border-radius:var(--r-lg);padding:10px 12px;font-size:12px;display:grid;gap:6px;box-shadow:var(--e3)}
+.demo div{display:flex;flex-wrap:wrap;gap:6px}
+.demo button{border:1px solid var(--border-strong);background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand">
+    <svg width="44" height="44" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#1D4ED8"/><path d="M8 7h8l4 4v10H8z" fill="#fff"/><path d="M16 7v4h4" fill="#BFDBFE"/><circle cx="19.5" cy="19" r="5" fill="#FDE68A"/><path d="M17.5 19h4M19.5 17v4" stroke="#0F172A" stroke-width="1.2"/></svg>
+    <h1>Chat với tài liệu</h1>
+    <p>Đăng nhập để hỏi đáp trên tài liệu của đội</p>
+  </div>
+
+  <div id="notice" role="alert" hidden></div>
+
+  <form id="f" novalidate style="margin-top:0">
+    <div class="field">
+      <label for="email">Email</label>
+      <input class="input" id="email" type="email" autocomplete="username" inputmode="email" placeholder="ten@congty.vn" aria-describedby="e-email">
+      <div class="err" id="e-email" hidden></div>
+    </div>
+    <div class="field">
+      <label for="pw">Mật khẩu</label>
+      <div class="pw">
+        <input class="input" id="pw" type="password" autocomplete="current-password" aria-describedby="e-pw">
+        <button type="button" id="eye" aria-label="Hiện mật khẩu" aria-pressed="false">👁</button>
+      </div>
+      <div class="err" id="e-pw" hidden></div>
+    </div>
+    <button class="btn" id="go" type="submit">Đăng nhập</button>
+  </form>
+  <p class="foot">Quên mật khẩu? Liên hệ Admin để được đặt lại.<br>Tài khoản do Admin tạo; không có đăng ký công khai.</p>
+</main>
+
+<aside class="demo" aria-label="Điều khiển demo">
+  <b>Demo — trạng thái thiết kế</b>
+  <div><button data-s="invalid">Sai thông tin</button><button data-s="locked">Bị khóa</button><button data-s="disabled">Vô hiệu hóa</button><button data-s="expired">Hết phiên</button><button data-s="clear">Xóa</button></div>
+  <span>Thử: email chứa “temp” → bắt đổi mật khẩu; email bất kỳ + mật khẩu ≠ “wrong” → vào workspace.</span>
+</aside>
+
+<script>
+const $=s=>document.querySelector(s);
+const N={
+ invalid:['danger','⚠','Email hoặc mật khẩu không đúng.'],
+ locked:['warn','⏱','Tài khoản tạm khóa do nhập sai nhiều lần. Thử lại sau 15 phút.'],
+ disabled:['danger','⛔','Tài khoản đã bị vô hiệu hóa, liên hệ Admin.'],
+ expired:['info','ⓘ','Phiên làm việc đã hết hạn. Đăng nhập lại để tiếp tục — câu hỏi đang soạn đã được giữ lại.']};
+function notice(k){const n=$('#notice');if(!N[k]){n.hidden=true;n.className='';return}const[c,i,t]=N[k];n.className='alert '+c;n.style.marginBottom='16px';n.replaceChildren(Object.assign(document.createElement('span'),{textContent:i}),Object.assign(document.createElement('span'),{textContent:t}));n.hidden=false}
+function fieldErr(id,msg){const e=$('#e-'+id),i=$('#'+(id==='pw'?'pw':id));e.hidden=!msg;e.textContent=msg||'';i.setAttribute('aria-invalid',!!msg)}
+$('#eye').onclick=()=>{const p=$('#pw'),s=p.type==='password';p.type=s?'text':'password';$('#eye').setAttribute('aria-pressed',s);$('#eye').setAttribute('aria-label',s?'Ẩn mật khẩu':'Hiện mật khẩu')};
+$('#f').onsubmit=e=>{
+ e.preventDefault();notice('');
+ const em=$('#email').value.trim(),pw=$('#pw').value;
+ fieldErr('email',!em?'Vui lòng nhập email.':!/^\S+@\S+\.\S+$/.test(em)?'Email chưa đúng định dạng.':'');
+ fieldErr('pw',!pw?'Vui lòng nhập mật khẩu.':'');
+ if(!em||!pw||!/^\S+@\S+\.\S+$/.test(em)){($('#email').getAttribute('aria-invalid')==='true'?$('#email'):$('#pw')).focus();return}
+ const b=$('#go');b.disabled=true;b.replaceChildren(Object.assign(document.createElement('span'),{className:'spin'}),'Đang đăng nhập…');
+ setTimeout(()=>{
+  if(pw==='wrong'){b.disabled=false;b.textContent='Đăng nhập';notice('invalid');return}
+  location.href=/temp/i.test(em)?'SCR-02_change-password.html?mode=required':'SCR-03_workspace-chat.html';
+ },700);
+};
+document.querySelectorAll('.demo [data-s]').forEach(b=>b.onclick=()=>notice(b.dataset.s));
+if(location.hash==='#expired')notice('expired');
+</script>
+</body>
+</html>

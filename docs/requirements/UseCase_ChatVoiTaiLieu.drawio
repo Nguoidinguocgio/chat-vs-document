@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="usecase-chat-tai-lieu" name="Use Case - Chat với tài liệu">
-        <mxGraphModel dx="3610" dy="1638" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1660" pageHeight="1460" math="0" shadow="0">
+        <mxGraphModel dx="3017" dy="1139" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1660" pageHeight="1460" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -22,19 +22,16 @@
                 <mxCell id="actBD" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Nhân viên&lt;br&gt;phát triển kinh doanh" vertex="1">
                     <mxGeometry height="60" width="30" x="40" y="470" as="geometry"/>
                 </mxCell>
-                <mxCell id="actMgr" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Quản lý" vertex="1">
+                <mxCell id="actMgr" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Quản lý /&lt;br&gt;Trưởng nhóm" vertex="1">
                     <mxGeometry height="60" width="30" x="150" y="1090" as="geometry"/>
                 </mxCell>
                 <mxCell id="actAdmin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Quản trị viên" vertex="1">
                     <mxGeometry height="60" width="30" x="40" y="1180" as="geometry"/>
                 </mxCell>
-                <mxCell id="actAI" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Dịch vụ AI&lt;br&gt;(actor phụ)" vertex="1">
+                <mxCell id="actAI" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Dịch vụ AI bên ngoài&lt;br&gt;(đã phê duyệt — D-006)&lt;br&gt;(actor phụ)" vertex="1">
                     <mxGeometry height="60" width="30" x="1420" y="420" as="geometry"/>
                 </mxCell>
-                <mxCell id="actAuth" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;" value="Hệ thống xác thực&lt;br&gt;(actor phụ)" vertex="1">
-                    <mxGeometry height="60" width="30" x="1420" y="1030" as="geometry"/>
-                </mxCell>
-                <mxCell id="UC01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-01&lt;/b&gt;&lt;br&gt;Tải lên tài liệu PDF" vertex="1">
+                <mxCell id="UC01" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-01&lt;/b&gt;&lt;br&gt;Tải lên tài liệu PDF&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;(≤ 20 file, ≤ 10 MB, ≤ 100 trang)&lt;/font&gt;" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="95" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC02" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-02&lt;/b&gt;&lt;br&gt;Xem danh sách tài liệu" vertex="1">
@@ -49,13 +46,13 @@
                 <mxCell id="UC05" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-05&lt;/b&gt;&lt;br&gt;Thông báo tài liệu không dùng được" vertex="1">
                     <mxGeometry height="64" width="200" x="720" y="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;fontSize=12;" value="&lt;b&gt;UC-14&lt;/b&gt;&lt;br&gt;Tóm tắt tài liệu" vertex="1">
+                <mxCell id="UC14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" value="&lt;b&gt;UC-14&lt;/b&gt;&lt;br&gt;Tóm tắt tài liệu" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="430" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC07" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-07&lt;/b&gt;&lt;br&gt;Tạo phản hồi kèm trích dẫn nguồn" vertex="1">
                     <mxGeometry height="64" width="200" x="720" y="425" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-17&lt;/b&gt;&lt;br&gt;Kiểm tra quyền truy cập tài liệu" vertex="1">
+                <mxCell id="UC17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-17&lt;/b&gt;&lt;br&gt;Kiểm tra quyền truy cập workspace" vertex="1">
                     <mxGeometry height="64" width="200" x="1060" y="525" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC06" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-06&lt;/b&gt;&lt;br&gt;Đặt câu hỏi về tài liệu" vertex="1">
@@ -64,7 +61,7 @@
                 <mxCell id="UC08" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-08&lt;/b&gt;&lt;br&gt;Thông báo không tìm thấy thông tin" vertex="1">
                     <mxGeometry height="64" width="200" x="680" y="505" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC09" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" value="&lt;b&gt;UC-09&lt;/b&gt;&lt;br&gt;Giới hạn phạm vi tài liệu" vertex="1">
+                <mxCell id="UC09" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;fontSize=12;" value="&lt;b&gt;UC-09&lt;/b&gt;&lt;br&gt;Giới hạn phạm vi tài liệu&lt;br&gt;&lt;i&gt;(hoãn sau MVP)&lt;/i&gt;" vertex="1">
                     <mxGeometry height="64" width="200" x="750" y="580" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" value="&lt;b&gt;UC-10&lt;/b&gt;&lt;br&gt;Hỏi tiếp nối trong hội thoại" vertex="1">
@@ -76,20 +73,23 @@
                 <mxCell id="UC13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" value="&lt;b&gt;UC-13&lt;/b&gt;&lt;br&gt;Đánh giá câu trả lời" vertex="1">
                     <mxGeometry height="64" width="200" x="750" y="805" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;fontSize=12;" value="&lt;b&gt;UC-15&lt;/b&gt;&lt;br&gt;Sao chép câu trả lời kèm trích dẫn" vertex="1">
+                <mxCell id="UC15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;fontSize=12;" value="&lt;b&gt;UC-15&lt;/b&gt;&lt;br&gt;Sao chép câu trả lời kèm trích dẫn&lt;br&gt;&lt;i&gt;(hoãn sau MVP)&lt;/i&gt;" vertex="1">
                     <mxGeometry height="64" width="200" x="680" y="880" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" value="&lt;b&gt;UC-12&lt;/b&gt;&lt;br&gt;Xem lịch sử hội thoại" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="885" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-16&lt;/b&gt;&lt;br&gt;Đăng nhập" vertex="1">
+                <mxCell id="UC16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-16&lt;/b&gt;&lt;br&gt;Đăng nhập&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;(email + mật khẩu)&lt;/font&gt;" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="1030" as="geometry"/>
                 </mxCell>
                 <mxCell id="UC18" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-18&lt;/b&gt;&lt;br&gt;Xem báo cáo sử dụng" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="1110" as="geometry"/>
                 </mxCell>
-                <mxCell id="UC19" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-19&lt;/b&gt;&lt;br&gt;Quản lý quyền truy cập người dùng" vertex="1">
+                <mxCell id="UC19" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-19&lt;/b&gt;&lt;br&gt;Quản lý tài khoản người dùng&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;(tạo, vô hiệu hóa, đặt lại mật khẩu)&lt;/font&gt;" vertex="1">
                     <mxGeometry height="64" width="200" x="380" y="1190" as="geometry"/>
+                </mxCell>
+                <mxCell id="UC20" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="&lt;b&gt;UC-20&lt;/b&gt;&lt;br&gt;Đổi mật khẩu" vertex="1">
+                    <mxGeometry height="64" width="200" x="760" y="1030" as="geometry"/>
                 </mxCell>
                 <mxCell id="g1" edge="1" parent="1" source="actBD" style="endArrow=block;endFill=0;endSize=14;html=1;rounded=0;" target="actUser" value="">
                     <mxGeometry relative="1" as="geometry"/>
@@ -130,7 +130,7 @@
                 <mxCell id="a10" edge="1" parent="1" source="UC07" style="endArrow=none;html=1;rounded=0;" target="actAI" value="">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="a11" edge="1" parent="1" source="UC16" style="endArrow=none;html=1;rounded=0;" target="actAuth" value="">
+                <mxCell id="a12" edge="1" parent="1" source="actAdmin" style="endArrow=none;html=1;rounded=0;" target="UC18" value="">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="i1" edge="1" parent="1" source="UC01" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC04" value="«include»">
@@ -145,7 +145,7 @@
                 <mxCell id="i4" edge="1" parent="1" source="UC07" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC17" value="«include»">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e1" edge="1" parent="1" source="UC05" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC01" value="«extend»&lt;br&gt;[tài liệu không hợp lệ]">
+                <mxCell id="e1" edge="1" parent="1" source="UC05" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC01" value="«extend»&lt;br&gt;[tài liệu không hợp lệ: sai định dạng,&lt;br&gt;có mật khẩu, PDF scan, vượt giới hạn]">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="e2" edge="1" parent="1" source="UC08" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC06" value="«extend»&lt;br&gt;[không có thông tin]">
@@ -166,11 +166,14 @@
                 <mxCell id="e7" edge="1" parent="1" source="UC15" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC06" value="«extend»">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="legend" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" value="&lt;b&gt;Chú giải&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background:#dae8fc;border:1px solid #6c8ebf&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Must&lt;br&gt;&lt;span style=&quot;background:#d5e8d4;border:1px solid #82b366&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Should&lt;br&gt;&lt;span style=&quot;background:#fff2cc;border:1px dashed #d6b656&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Could (đề xuất của BA)&lt;br&gt;———  Association&lt;br&gt;- - -&amp;gt;  «include»: luôn thực hiện&lt;br&gt;- - -&amp;gt;  «extend»: tùy chọn / có điều kiện&lt;br&gt;——▷  Generalization (kế thừa actor)" vertex="1">
-                    <mxGeometry height="160" width="230" x="1390" y="1130" as="geometry"/>
+                <mxCell id="e8" edge="1" parent="1" source="UC20" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=11;labelBackgroundColor=#ffffff;" target="UC16" value="«extend»&lt;br&gt;[đăng nhập lần đầu bằng mật khẩu tạm&lt;br&gt;hoặc người dùng chủ động đổi]">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="trace" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" value="&lt;b&gt;Truy vết Use Case → Yêu cầu nghiệp vụ (docs/requirements/BRD.md)&lt;/b&gt;&lt;br&gt;UC-01 → BR-001, BR-002 &amp;nbsp;|&amp;nbsp; UC-02 → BR-003 &amp;nbsp;|&amp;nbsp; UC-03 → BR-005 &amp;nbsp;|&amp;nbsp; UC-04 → BRU-001, BRU-004 &amp;nbsp;|&amp;nbsp; UC-05 → BR-004&lt;br&gt;UC-06 → BR-006, BR-012, BR-013 &amp;nbsp;|&amp;nbsp; UC-07 → BR-007, BR-008, BRU-002 &amp;nbsp;|&amp;nbsp; UC-08 → BR-009 &amp;nbsp;|&amp;nbsp; UC-09 → BR-010 &amp;nbsp;|&amp;nbsp; UC-10 → BR-011&lt;br&gt;UC-11 → BR-022 &amp;nbsp;|&amp;nbsp; UC-12 → BR-014 &amp;nbsp;|&amp;nbsp; UC-13 → BR-018 &amp;nbsp;|&amp;nbsp; UC-14 → BR-020 &amp;nbsp;|&amp;nbsp; UC-15 → BR-021&lt;br&gt;UC-16 → BR-015 &amp;nbsp;|&amp;nbsp; UC-17 → BR-016, BR-017 &amp;nbsp;|&amp;nbsp; UC-18 → BR-019 &amp;nbsp;|&amp;nbsp; UC-19 → BR-015&lt;br&gt;&lt;i&gt;Lưu ý: Hệ thống xác thực phụ thuộc OQ-008; mô hình chia sẻ tài liệu (UC-17) phụ thuộc OQ-007; việc dùng Dịch vụ AI bên ngoài phụ thuộc OQ-006.&lt;/i&gt;" vertex="1">
-                    <mxGeometry height="115" width="1040" x="320" y="1310" as="geometry"/>
+                <mxCell id="legend" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" value="&lt;b&gt;Chú giải&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background:#dae8fc;border:1px solid #6c8ebf&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Must / P0 — bắt buộc để launch&lt;br&gt;&lt;span style=&quot;background:#d5e8d4;border:1px solid #82b366&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Should / P1 — trong phạm vi MVP&lt;br&gt;&lt;span style=&quot;background:#fff2cc;border:1px dashed #d6b656&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; Could / P2 — hoãn sau MVP&lt;br&gt;———  Association&lt;br&gt;- - -&amp;gt;  «include»: luôn thực hiện&lt;br&gt;- - -&amp;gt;  «extend»: tùy chọn / có điều kiện&lt;br&gt;——▷  Generalization (kế thừa actor)" vertex="1">
+                    <mxGeometry height="170" width="250" x="1380" y="1100" as="geometry"/>
+                </mxCell>
+                <mxCell id="trace" parent="1" style="shape=note;whiteSpace=wrap;html=1;size=14;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" value="&lt;b&gt;Truy vết Use Case → Yêu cầu nghiệp vụ (docs/requirements/BRD.md v0.2) → User story (docs/requirements/PRD.md)&lt;/b&gt;&lt;br&gt;UC-01 → BR-001, BR-002 / US-010, US-015 &amp;nbsp;|&amp;nbsp; UC-02 → BR-003 / US-011 &amp;nbsp;|&amp;nbsp; UC-03 → BR-005, BRU-007 / US-013 &amp;nbsp;|&amp;nbsp; UC-04 → BRU-001, BRU-004, BRU-006 / US-010 &amp;nbsp;|&amp;nbsp; UC-05 → BR-004 / US-012&lt;br&gt;UC-06 → BR-006, BR-012, BR-013 / US-020, US-024, US-026 &amp;nbsp;|&amp;nbsp; UC-07 → BR-007, BR-008, BRU-002 / US-021, US-022 &amp;nbsp;|&amp;nbsp; UC-08 → BR-009 / US-023 &amp;nbsp;|&amp;nbsp; UC-09 → BR-010 / US-090 &amp;nbsp;|&amp;nbsp; UC-10 → BR-011 / US-025&lt;br&gt;UC-11 → BR-022 / US-030 &amp;nbsp;|&amp;nbsp; UC-12 → BR-014 / US-040, US-041 &amp;nbsp;|&amp;nbsp; UC-13 → BR-018 / US-051 &amp;nbsp;|&amp;nbsp; UC-14 → BR-020 / US-014 &amp;nbsp;|&amp;nbsp; UC-15 → BR-021 / US-091&lt;br&gt;UC-16 → BR-015 / US-001 &amp;nbsp;|&amp;nbsp; UC-17 → BR-016, BR-017 / US-060 &amp;nbsp;|&amp;nbsp; UC-18 → BR-019 / US-050 &amp;nbsp;|&amp;nbsp; UC-19 → BR-015 / US-002, US-003, US-004 &amp;nbsp;|&amp;nbsp; UC-20 → BR-015 / US-001 (AC-001.4), US-005&lt;br&gt;&lt;i&gt;Quyết định áp dụng (PRD §1.3): D-001 một workspace chung, hội thoại riêng từng người (UC-17) · D-002 giới hạn 20 file / 10 MB / 100 trang (UC-01) · D-005 tiếng Việt + tiếng Anh (UC-06) · D-006 dịch vụ AI bên ngoài có điều kiện, chờ An toàn thông tin ký (OQ-006) · D-007 đăng nhập email + mật khẩu do Quản trị viên tạo, không dùng hệ thống xác thực ngoài (UC-16, UC-19, UC-20) · D-008 không hỗ trợ PDF scan (UC-05), hội thoại lưu 90 ngày (UC-12).&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="140" width="1040" x="320" y="1310" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
