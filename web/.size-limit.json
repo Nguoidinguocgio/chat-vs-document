@@ -1,0 +1,14 @@
+[
+  {
+    "name": "JS khởi tạo (route /c)",
+    "path": "dist/assets/index-*.js",
+    "limit": "200 KB",
+    "gzip": true
+  },
+  {
+    "name": "CSS",
+    "path": "dist/assets/*.css",
+    "limit": "40 KB",
+    "gzip": true
+  }
+]

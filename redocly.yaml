@@ -1,0 +1,10 @@
+# Cấu hình lint contracts/openapi.yaml (CI job "contract").
+extends:
+  - recommended
+rules:
+  # Schema sự kiện SSE được tham chiếu qua x-sse-events (tiện ích mở rộng) nên bị coi là chưa dùng.
+  no-unused-components: off
+  # API nội bộ, không phát hành công khai.
+  info-license: off
+  # Đăng xuất / dừng / SSE có lỗi chung (401/403) mô tả ở đầu tài liệu.
+  operation-4xx-response: off

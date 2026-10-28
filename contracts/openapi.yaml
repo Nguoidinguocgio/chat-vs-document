@@ -1,0 +1,611 @@
+openapi: 3.1.0
+info:
+  title: Chat với tài liệu — API
+  version: 0.1.0
+  description: |
+    Hợp đồng API duy nhất giữa web và api (T06). Mọi thay đổi đi qua PR sửa file này trước.
+    - Tiền tố `/api`; JSON UTF-8; tên trường `snake_case`; ID là UUID; thời gian ISO 8601 UTC.
+    - Cookie phiên `sid` (HttpOnly; Secure; SameSite=Strict).
+    - POST/PUT/PATCH/DELETE phải có header `X-Requested-With: fetch`, thiếu → `403 FORBIDDEN`.
+    - Lỗi luôn theo schema `Error`; client chỉ tra thông điệp theo `message_key`.
+    - `x-implemented-in` ghi task đã hiện thực endpoint; test hợp đồng ở backend chỉ kiểm các endpoint đó.
+servers:
+  - url: /
+security:
+  - session: []
+
+tags:
+  - name: auth
+    description: Đăng nhập và phiên (T04)
+  - name: documents
+    description: Tài liệu PDF (T07, T09)
+  - name: events
+    description: Sự kiện thời gian thực (T09)
+  - name: analytics
+    description: Analytics phía client (T09)
+  - name: conversations
+    description: Hội thoại và hỏi đáp (T14, T17)
+  - name: sources
+    description: Nguồn trích dẫn (T17)
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [auth]
+      operationId: login
+      summary: Đăng nhập
+      security: []
+      x-implemented-in: T04
+      parameters: [{ $ref: '#/components/parameters/XRequestedWith' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Đăng nhập thành công; đặt cookie `sid`.
+          headers:
+            Set-Cookie: { schema: { type: string }, description: 'sid=…; HttpOnly; Secure; SameSite=Strict; Path=/' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CurrentUser' }
+        '401': { $ref: '#/components/responses/InvalidCredentials' }
+        '403': { $ref: '#/components/responses/AccountDisabled' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '423': { $ref: '#/components/responses/AccountLocked' }
+
+  /api/auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      summary: Đăng xuất
+      x-implemented-in: T04
+      parameters: [{ $ref: '#/components/parameters/XRequestedWith' }]
+      responses:
+        '204': { description: Đã xóa phiên và cookie. }
+
+  /api/me:
+    get:
+      tags: [auth]
+      operationId: getMe
+      summary: Người dùng hiện tại
+      x-implemented-in: T04
+      responses:
+        '200':
+          description: Người dùng hiện tại.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CurrentUser' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /api/auth/change-password:
+    post:
+      tags: [auth]
+      operationId: changePassword
+      summary: Đổi mật khẩu
+      x-implemented-in: T04
+      parameters: [{ $ref: '#/components/parameters/XRequestedWith' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangePasswordRequest' }
+      responses:
+        '204': { description: Đã đổi; mọi phiên khác bị hủy. }
+        '401': { $ref: '#/components/responses/InvalidCredentials' }
+        '422':
+          description: 'Không đạt chính sách (`message_key=auth.password_policy`): ≥ 10 ký tự, có chữ và số, khác mật khẩu cũ.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/documents:
+    get:
+      tags: [documents]
+      operationId: listDocuments
+      summary: Danh sách tài liệu
+      x-implemented-in: T09
+      responses:
+        '200':
+          description: Mọi tài liệu chưa xóa, mới nhất trước.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DocumentList' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [documents]
+      operationId: uploadDocument
+      summary: Tải lên PDF
+      x-implemented-in: T07
+      parameters:
+        - $ref: '#/components/parameters/XRequestedWith'
+        - name: X-Batch-Size
+          in: header
+          required: false
+          description: Số file người dùng chọn cùng lúc (analytics EV-010).
+          schema: { type: integer, minimum: 1, maximum: 100 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary, description: 'PDF ≤ 10 MB (kiểm tra cả đuôi và nội dung `%PDF-`).' }
+      responses:
+        '201':
+          description: Đã nhận, đang xử lý.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Document' }
+        '400': { description: '`NOT_PDF`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '409': { description: '`DOCUMENT_LIMIT_REACHED` (`details.limit`)', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '413': { description: '`FILE_TOO_LARGE`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/documents/{id}/retry:
+    post:
+      tags: [documents]
+      operationId: retryDocument
+      summary: Thử lại xử lý tài liệu
+      x-implemented-in: T07
+      parameters:
+        - $ref: '#/components/parameters/XRequestedWith'
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '202':
+          description: Đã xếp hàng xử lý lại.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Document' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: '`NOT_RETRYABLE` (chỉ thử lại được khi `error_code=SYSTEM_ERROR`)', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/documents/{id}/file:
+    get:
+      tags: [sources]
+      operationId: getDocumentFile
+      summary: Tải file PDF gốc
+      x-implemented-in: T17
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: Range, in: header, required: false, schema: { type: string } }
+      responses:
+        '200': { description: File PDF., content: { application/pdf: { schema: { type: string, format: binary } } } }
+        '206': { description: Một phần file (Range)., content: { application/pdf: { schema: { type: string, format: binary } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '410': { description: '`DOCUMENT_DELETED`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/events:
+    get:
+      tags: [events]
+      operationId: streamEvents
+      summary: Kênh sự kiện thời gian thực (SSE)
+      x-implemented-in: T09
+      description: |
+        Kênh sự kiện thời gian thực. Mỗi sự kiện có `id:` tăng dần; gửi lại `Last-Event-ID` để nhận sự kiện bị lỡ,
+        hoặc nhận `resync` nếu đã quá cũ (client tải lại danh sách). Có dòng `: ping` mỗi 10 s, `heartbeat` mỗi 20 s.
+        Tối đa 3 kết nối mỗi người dùng (kết nối cũ nhất bị đóng).
+      parameters:
+        - { name: Last-Event-ID, in: header, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: Luồng `text/event-stream`.
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+      x-sse-events:
+        document.created: { $ref: '#/components/schemas/Document' }
+        document.status_changed: { $ref: '#/components/schemas/Document' }
+        document.deleted: { $ref: '#/components/schemas/DocumentDeletedEvent' }
+        session.revoked: { $ref: '#/components/schemas/EmptyEvent' }
+        resync: { $ref: '#/components/schemas/EmptyEvent' }
+        heartbeat: { $ref: '#/components/schemas/EmptyEvent' }
+
+  /api/analytics/events:
+    post:
+      tags: [analytics]
+      operationId: postAnalyticsEvents
+      summary: Ghi sự kiện analytics
+      x-implemented-in: T09
+      parameters: [{ $ref: '#/components/parameters/XRequestedWith' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnalyticsBatch' }
+      responses:
+        '204': { description: Đã ghi. }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /api/conversations:
+    get:
+      tags: [conversations]
+      operationId: listConversations
+      summary: Danh sách hội thoại
+      x-implemented-in: T14
+      responses:
+        '200':
+          description: Hội thoại của người dùng, mới hoạt động nhất trước.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Conversation' } }
+    post:
+      tags: [conversations]
+      operationId: createConversation
+      summary: Tạo hội thoại
+      x-implemented-in: T14
+      parameters: [{ $ref: '#/components/parameters/XRequestedWith' }]
+      responses:
+        '201':
+          description: Hội thoại mới.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Conversation' }
+
+  /api/conversations/{id}:
+    get:
+      tags: [conversations]
+      operationId: getConversation
+      summary: Chi tiết hội thoại
+      x-implemented-in: T14
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: Hội thoại và các lượt hỏi đáp.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationDetail' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/conversations/{id}/messages:
+    post:
+      tags: [conversations]
+      operationId: askQuestion
+      summary: Đặt câu hỏi (SSE)
+      x-implemented-in: T14
+      parameters:
+        - $ref: '#/components/parameters/XRequestedWith'
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AskRequest' }
+      responses:
+        '200':
+          description: 'Luồng câu trả lời: `meta → status → delta… → citation… → done` hoặc `error`; luôn kết thúc bằng đúng một `done`/`error`.'
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: '`NO_READY_DOCUMENTS` hoặc `ANSWER_IN_PROGRESS`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { description: '`QUESTION_INVALID`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+      x-sse-events: &answerEvents
+        meta: { $ref: '#/components/schemas/AnswerMetaEvent' }
+        status: { $ref: '#/components/schemas/AnswerStatusEvent' }
+        delta: { $ref: '#/components/schemas/AnswerDeltaEvent' }
+        citation: { $ref: '#/components/schemas/Citation' }
+        done: { $ref: '#/components/schemas/AnswerDoneEvent' }
+        error: { $ref: '#/components/schemas/AnswerErrorEvent' }
+
+  /api/messages/{id}/stop:
+    post:
+      tags: [conversations]
+      operationId: stopAnswer
+      summary: Dừng câu trả lời
+      x-implemented-in: T17
+      parameters:
+        - $ref: '#/components/parameters/XRequestedWith'
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204': { description: Đã dừng (câu trả lời giữ trạng thái `stopped`). }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/messages/{id}/regenerate:
+    post:
+      tags: [conversations]
+      operationId: regenerateAnswer
+      summary: Tạo lại câu trả lời (SSE)
+      x-implemented-in: T17
+      parameters:
+        - $ref: '#/components/parameters/XRequestedWith'
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Luồng câu trả lời mới (cùng định dạng hỏi đáp).
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '409': { description: '`NOT_REGENERABLE`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+      x-sse-events: *answerEvents
+
+  /api/citations/{message_id}/{index}:
+    get:
+      tags: [sources]
+      operationId: getCitation
+      summary: Chi tiết trích dẫn
+      x-implemented-in: T17
+      parameters:
+        - { name: message_id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: index, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200':
+          description: Chi tiết nguồn để mở bảng Xem nguồn.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CitationDetail' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '410': { description: '`DOCUMENT_DELETED`', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: sid
+
+  parameters:
+    XRequestedWith:
+      name: X-Requested-With
+      in: header
+      required: true
+      description: Chống CSRF; thiếu → `403 FORBIDDEN`.
+      schema: { type: string, const: fetch }
+
+  responses:
+    Unauthenticated:
+      description: '`UNAUTHENTICATED` hoặc `SESSION_EXPIRED`'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Forbidden:
+      description: '`FORBIDDEN` hoặc `PASSWORD_CHANGE_REQUIRED`'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NotFound:
+      description: '`NOT_FOUND`'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ValidationError:
+      description: '`VALIDATION_ERROR`'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    InvalidCredentials:
+      description: '`INVALID_CREDENTIALS` — cùng phản hồi cho sai email và sai mật khẩu.'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    AccountDisabled:
+      description: '`ACCOUNT_DISABLED` (chỉ khi mật khẩu đúng).'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    AccountLocked:
+      description: '`ACCOUNT_LOCKED` với `details.retry_after_s`.'
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message_key, details]
+          properties:
+            code:
+              type: string
+              description: |
+                Dùng chung: UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, NOT_FOUND,
+                METHOD_NOT_ALLOWED, PAYLOAD_TOO_LARGE, UNSUPPORTED_MEDIA_TYPE, VALIDATION_ERROR, INTERNAL_ERROR.
+                Riêng: INVALID_CREDENTIALS, ACCOUNT_LOCKED, ACCOUNT_DISABLED, NOT_PDF, FILE_TOO_LARGE,
+                DOCUMENT_LIMIT_REACHED, NOT_RETRYABLE, QUESTION_INVALID, NO_READY_DOCUMENTS, ANSWER_IN_PROGRESS,
+                NOT_REGENERABLE, DOCUMENT_DELETED.
+              examples: [DOCUMENT_LIMIT_REACHED]
+            message_key: { type: string, examples: [documents.limit_reached] }
+            details: { type: object }
+
+    Role:
+      type: string
+      enum: [member, lead, admin]
+
+    CurrentUser:
+      type: object
+      additionalProperties: false
+      required: [id, email, display_name, role, must_change_password]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        display_name: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        must_change_password: { type: boolean }
+
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: { type: string, maxLength: 320 }
+        password: { type: string, maxLength: 1024 }
+
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [new_password]
+      properties:
+        current_password: { type: [string, 'null'], maxLength: 1024, description: Bỏ trống khi đang dùng mật khẩu tạm. }
+        new_password: { type: string, minLength: 10, maxLength: 1024 }
+
+    DocumentStatus:
+      type: string
+      enum: [processing, ready, failed]
+
+    DocumentErrorCode:
+      type: [string, 'null']
+      enum: [TOO_MANY_PAGES, PASSWORD_PROTECTED, SCANNED_PDF, CORRUPTED, SYSTEM_ERROR, null]
+
+    Document:
+      type: object
+      additionalProperties: false
+      required: [id, name, page_count, status, error_code, error_details, unreadable_pages, uploaded_by, uploaded_at, can_delete]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, maxLength: 255 }
+        page_count: { type: [integer, 'null'] }
+        status: { $ref: '#/components/schemas/DocumentStatus' }
+        error_code: { $ref: '#/components/schemas/DocumentErrorCode' }
+        error_details:
+          type: [object, 'null']
+          additionalProperties: false
+          description: Có khi `error_code=TOO_MANY_PAGES` (hiển thị "File có {n} trang…").
+          properties:
+            page_count: { type: integer }
+        unreadable_pages: { type: array, items: { type: integer, minimum: 1 } }
+        uploaded_by:
+          type: object
+          additionalProperties: false
+          required: [id, display_name]
+          properties:
+            id: { type: string, format: uuid }
+            display_name: { type: string }
+        uploaded_at: { type: string, format: date-time }
+        can_delete: { type: boolean }
+
+    DocumentList:
+      type: object
+      additionalProperties: false
+      required: [items, count, limit]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Document' } }
+        count: { type: integer, description: Số tài liệu chưa xóa ở mọi trạng thái. }
+        limit: { type: integer, const: 20 }
+
+    DocumentDeletedEvent:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string }
+
+    EmptyEvent:
+      type: object
+      additionalProperties: false
+
+    AnalyticsEvent:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          enum: [chat_answer_first_token, chat_answer_stopped, chat_answer_regenerated, citation_clicked, client_network_lost, client_network_restored]
+        ts: { type: string, format: date-time }
+        props:
+          type: object
+          description: Chỉ số, boolean hoặc ID/enum ≤ 64 ký tự theo danh sách trắng từng sự kiện; không có văn bản tự do.
+          additionalProperties:
+            type: [number, boolean, string]
+
+    AnalyticsBatch:
+      type: object
+      additionalProperties: false
+      required: [events]
+      properties:
+        events: { type: array, minItems: 1, maxItems: 50, items: { $ref: '#/components/schemas/AnalyticsEvent' } }
+
+    Conversation:
+      type: object
+      additionalProperties: false
+      required: [id, title, created_at, last_activity_at]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        created_at: { type: string, format: date-time }
+        last_activity_at: { type: string, format: date-time }
+
+    ConversationDetail:
+      type: object
+      additionalProperties: false
+      required: [conversation, messages]
+      properties:
+        conversation: { $ref: '#/components/schemas/Conversation' }
+        messages: { type: array, items: { $ref: '#/components/schemas/Message' } }
+
+    AskRequest:
+      type: object
+      additionalProperties: false
+      required: [question]
+      properties:
+        question: { type: string, minLength: 1, maxLength: 2000 }
+
+    Message:
+      type: object
+      additionalProperties: false
+      required: [id, question, answer, lang, status, answer_type, missing, error_code, citations, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        question: { type: string }
+        answer: { type: string }
+        lang: { type: string, enum: [vi, en] }
+        status: { type: string, enum: [streaming, completed, stopped, failed] }
+        answer_type: { type: [string, 'null'], enum: [answered, partial, not_found, null] }
+        missing: { type: [string, 'null'] }
+        error_code: { type: [string, 'null'], enum: [timeout, llm_error, rate_limited, null] }
+        citations: { type: array, items: { $ref: '#/components/schemas/Citation' } }
+        created_at: { type: string, format: date-time }
+
+    Citation:
+      type: object
+      additionalProperties: false
+      required: [index, document_id, document_name, page, document_deleted]
+      properties:
+        index: { type: integer, minimum: 1 }
+        document_id: { type: string, format: uuid }
+        document_name: { type: string }
+        page: { type: integer, minimum: 1 }
+        document_deleted: { type: boolean }
+
+    CitationDetail:
+      type: object
+      additionalProperties: false
+      required: [document_id, document_name, page, page_count, highlight]
+      properties:
+        document_id: { type: string, format: uuid }
+        document_name: { type: string }
+        page: { type: integer, minimum: 1 }
+        page_count: { type: integer }
+        highlight:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [snippet, page_text_start, page_text_end]
+          properties:
+            snippet: { type: string }
+            page_text_start: { type: integer }
+            page_text_end: { type: integer }
+
+    AnswerMetaEvent:
+      type: object
+      required: [message_id, lang]
+      properties:
+        message_id: { type: string, format: uuid }
+        lang: { type: string, enum: [vi, en] }
+    AnswerStatusEvent:
+      type: object
+      required: [phase]
+      properties:
+        phase: { type: string, enum: [retrieving] }
+    AnswerDeltaEvent:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+    AnswerDoneEvent:
+      type: object
+      required: [answer_type]
+      properties:
+        answer_type: { type: string, enum: [answered, partial, not_found] }
+        missing: { type: [string, 'null'] }
+    AnswerErrorEvent:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, enum: [timeout, llm_error, rate_limited] }

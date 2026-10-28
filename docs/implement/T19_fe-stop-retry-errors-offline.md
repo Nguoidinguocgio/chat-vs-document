@@ -49,7 +49,7 @@ Bất biến (CN-03): chỉ `answered`/`partial` có SourceList và được tr�
 Mọi thay đổi trạng thái được thông báo qua vùng `aria-live` riêng ("Đã dừng", "Kết nối bị gián đoạn", "Hệ thống phản hồi chậm…"); lỗi dùng `role="alert"`; nút có nhãn rõ; thứ tự focus không bị mất khi thẻ thay đổi (giữ focus ở nút vừa bấm hoặc chuyển tới nút "Tạo lại").
 
 ## 4. Tệp sẽ tạo
-Mở rộng `features/chat/{useAnswerStream, answerReducer, AnswerCard, Composer}`, `features/chat/StatusNotes.tsx`, `app/ConnectionBanner.tsx` (bản đầy đủ), `shared/lib/network.ts`, mở rộng `mocks` (kịch bản `interrupted`, `timeout`, `llm_error`, 409/401 giữa luồng), `*.test.tsx`.
+Mở rộng `features/chat/{useAnswerStream, answerReducer, AnswerCard, Composer}`, `features/chat/StatusNotes.tsx`, `app/ConnectionBanner.tsx` (bản đầy đủ), `shared/lib/network.ts`, mở rộng `mocks` (kịch bản `interrupted`, `timeout`, `llm_error`, 409/401 giữa luồng), `*.test.ts`. (Các thành phần trong danh sách trên là tệp `.vue`.)
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-020.3 + US-026: khi đang trả lời, Gửi bị thay bằng Dừng; Dừng làm UI dừng ≤ 1 giây (đồng hồ giả), giữ phần đã hiển thị, nhãn "Đã dừng", có "Tạo lại"; `POST …/stop` được gọi đúng một lần với đúng `message_id`.

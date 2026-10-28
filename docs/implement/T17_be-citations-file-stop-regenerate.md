@@ -25,7 +25,7 @@ Cho phép người dùng **kiểm chứng** câu trả lời (xem đúng trang P
   {"document_id":"…","document_name":"HopDong_A.pdf","page":12,"page_count":48,
    "highlight":{"snippet":"Bên B thanh toán giá trị đợt 1 trong vòng 30 …","page_text_start":1180,"page_text_end":1890}}
   ```
-  `snippet` = tối đa 300 ký tự đầu của **chunk** đã trích (văn bản chuẩn hóa từ `chunks.text`); `page_text_start/end` = `chunks.char_start/char_end` trên văn bản trang. `highlight` là `null` nếu không tìm thấy chunk (dữ liệu cũ). Client dùng `snippet` để tìm đoạn trong lớp văn bản của pdf.js (T18); vị trí ký tự chỉ là gợi ý bổ sung vì cách tách văn bản của PyMuPDF và pdf.js có thể khác nhau.
+  `snippet` = tối đa 300 ký tự đầu của **chunk** đã trích (văn bản chuẩn hóa từ `chunks.text`); `page_text_start/end` = `chunks.char_start/char_end` trên văn bản trang. `highlight` là `null` nếu không tìm thấy chunk (dữ liệu cũ). Client dùng `snippet` để tìm đoạn trong lớp văn bản của pdf.js (T18); vị trí ký tự chỉ là gợi ý bổ sung vì cách tách văn bản của PDFBox và pdf.js có thể khác nhau.
 - Ghi analytics **không** nằm ở đây (EV-030 do client gửi).
 
 ### 3.2 `GET /api/documents/{id}/file`
@@ -43,7 +43,7 @@ Tin nhắn phải thuộc người gọi (`404` nếu không). **Idempotent**, t
 - Ghi analytics **EV-025** `chat_answer_regenerated {question_id, previous_outcome}` (`previous_outcome` = `stopped|failed:<error_code>`).
 
 ## 4. Tệp sẽ tạo
-`routers/citations.py`, mở rộng `routers/documents.py` (file), `routers/chat.py` (stop/regenerate), `services/range_response.py`, `tests/test_citations_*.py`, `tests/test_file_range.py`, `tests/test_stop_regenerate.py`.
+`web/CitationController.java`, mở rộng `web/DocumentController.java` (file) và `web/ChatController.java` (stop/regenerate), `service/RangeResponseService.java` (hỗ trợ `Range` với `ResourceRegion`/`ResponseEntity<StreamingResponseBody>`), `CitationControllerIT.java`, `FileRangeIT.java`, `StopRegenerateIT.java`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-030.1 (phần backend): với câu trả lời có trích dẫn, `GET /citations/...` trả đúng tài liệu, trang, `page_count`, `snippet` thuộc đúng trang đó.
@@ -58,7 +58,7 @@ Tin nhắn phải thuộc người gọi (`404` nếu không). **Idempotent**, t
 - [ ] EV-022 và EV-025 ghi đúng thuộc tính, không chứa nội dung.
 
 ## 6. Kiểm thử
-pytest + `FakeLLM`; test `Range` bằng file 1 MB tạo ngẫu nhiên; đồng hồ giả cho giới hạn 1 giây; test quyền truy cập chéo hội thoại.
+JUnit 5 + `FakeLLM`; test `Range` bằng file 1 MB tạo ngẫu nhiên; `Clock` giả cho giới hạn 1 giây; test quyền truy cập chéo hội thoại.
 
 ## 7. Ghi chú
 Nếu OQ-UX-01 trả lời rằng không thể làm nổi bật theo vị trí, `snippet` vẫn đủ cho cách tìm chuỗi phía client (T18) — đó đã là phương án chính ở thiết kế này.

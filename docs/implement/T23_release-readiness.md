@@ -51,7 +51,7 @@ Nội dung bắt buộc (tiếng Việt, 1 trang, kèm ảnh chụp từ ứng d
 Bảng G-01 … G-14 của PRD §6.1: trạng thái, bằng chứng (liên kết báo cáo), người ký. Điền các mục thuộc lát cắt hai story (G-01, G-02, G-03, G-04, G-05, G-06, G-07, G-09, G-10, G-11, G-12, G-13, G-14); G-08 (ATTT + Pháp chế ký) nhắc ở đầu bảng vì **thiếu chữ ký = không launch**. Mục chưa thuộc lát cắt (US-050 báo cáo, US-061 nhật ký đầy đủ, quản trị người dùng) ghi rõ "chưa làm" và là điều kiện bổ sung.
 
 ## 4. Tệp sẽ tạo
-`ops/monitoring/*` (cấu hình cảnh báo, bảng điều khiển), `ops/runbook.md`, `ops/backup/*`, `docs/uat/UAT-plan.md` + biên bản, `docs/guides/huong-dan-su-dung.md` (+ bản PDF/ảnh), `docs/launch/launch-checklist.md`, `api/app/routers/health.py` (`/readyz`), bảng kiểm analytics.
+`ops/monitoring/*` (cấu hình cảnh báo, bảng điều khiển), `ops/runbook.md`, `ops/backup/*`, `docs/uat/UAT-plan.md` + biên bản, `docs/guides/huong-dan-su-dung.md` (+ bản PDF/ảnh), `docs/launch/launch-checklist.md`, `api/src/main/java/com/chatvsdoc/api/web/HealthController.java` (`/readyz`, kiểm tra kết nối DB qua Actuator `HealthIndicator`), bảng kiểm analytics.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] Giám sát lỗi FE và BE hoạt động; **kiểm chứng** không có nội dung nghiệp vụ trong công cụ giám sát (G-13, S-10).

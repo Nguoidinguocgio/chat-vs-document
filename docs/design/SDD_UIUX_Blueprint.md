@@ -42,7 +42,7 @@ flowchart LR
 | Loại | Nội dung |
 |---|---|
 | **Kỹ thuật** | Web (CON-002), chỉ PDF (CON-003), Chrome/Edge 2 bản mới nhất, tối ưu ≥ 1280 px (NFR-U01), giao diện tiếng Việt (NFR-U02), WCAG 2.1 AA (NFR-U03). Quyền do backend thực thi; UI chỉ ẩn/hiện (NFR-S04). |
-| **Ngăn xếp FE [Đề xuất]** | React 18 + TypeScript + Vite; TanStack Query; Radix UI + Tailwind (token CSS); `pdfjs-dist`; `react-markdown` + `rehype-sanitize`; Vitest, Playwright, axe-core. |
+| **Ngăn xếp FE [Đề xuất]** | Vue 3 (Composition API) + TypeScript + Vite; Pinia; Vue Router; TanStack Query (`@tanstack/vue-query`); Reka UI (Radix Vue) + Tailwind (token CSS); `pdfjs-dist`; `markdown-it` + DOMPurify; Vitest + Vue Test Utils, Playwright, axe-core. |
 | **Nghiệp vụ** | MVP: chỉ P0 được bảo đảm, P1 nếu kịp, P2 không thiết kế (lọc tài liệu, sao chép, OCR). Một workspace chung, hội thoại riêng tư (D-001). Ngân sách/thời hạn: [TBD: OQ-011]. |
 | **Môi trường** | Mạng văn phòng ổn định, độ trễ < 100 ms; proxy nội bộ không đệm SSE [cần CNTT xác nhận — OQ-UX-02]. |
 | **Dữ liệu** | ≤ 20 tài liệu (≤ 10 MB, ≤ 100 trang), câu hỏi 1–2.000 ký tự, hội thoại giữ 90 ngày, ≥ 10 người đồng thời (NFR-C01). Danh sách tài liệu không cần phân trang. |
@@ -122,7 +122,7 @@ Client được phân rã theo **feature** (mỗi epic của PRD một module) t
 | `features/conversations` | Danh sách hội thoại, tạo/xóa | shared | US-040, US-041 |
 | `features/admin` | Quản lý người dùng, nhật ký kiểm toán | shared | US-002 – US-004, US-061 |
 | `features/reports` | Báo cáo tuần | shared | US-050 |
-| `shared/ui` | Design system: token + component cơ sở | Radix, Tailwind | — |
+| `shared/ui` | Design system: token + component cơ sở | Reka UI, Tailwind | — |
 | `shared/api` | HTTP client, ánh xạ mã lỗi → thông điệp, xử lý 401/403 | — | IF-01…IF-10 |
 | `shared/realtime` | Kênh SSE workspace, tự kết nối lại | api | AC-011.2, AC-003.1 |
 | `shared/lib` | `markdown`, `citations`, `draft`, `format`, `analytics`, `i18n` | — | — |
@@ -170,7 +170,7 @@ Guard phía client chỉ phục vụ trải nghiệm; chưa đăng nhập → `/
 | CMP-12 | `SourceViewerPanel` | Tên tài liệu, "Trang p/N", trước/sau, canvas PDF + lớp nổi bật |
 | CMP-13 | `ConfirmDialog`, `ToastRegion` | Xác nhận thao tác phá hủy; thông báo không chặn (tối đa 3, tự ẩn 5 s, lỗi giữ đến khi đóng) |
 
-**Mẫu thiết kế:** feature-sliced; container/presentational (hook dữ liệu tách khỏi component để test bằng props); **máy trạng thái hữu hạn** cho tài liệu/câu trả lời/Composer (loại trạng thái mâu thuẫn); Pub-Sub qua SSE cập nhật cache (không polling); Error Boundary theo vùng; ánh xạ DTO → kiểu nội bộ (UI không lộ lỗi kỹ thuật thô).
+**Mẫu thiết kế:** feature-sliced; container/presentational (composable dữ liệu tách khỏi component để test bằng props); **máy trạng thái hữu hạn** cho tài liệu/câu trả lời/Composer (loại trạng thái mâu thuẫn); Pub-Sub qua SSE cập nhật cache (không polling); biên lỗi theo vùng (`onErrorCaptured`); ánh xạ DTO → kiểu nội bộ (UI không lộ lỗi kỹ thuật thô).
 
 ### 3.3 Dependency View
 
@@ -181,7 +181,7 @@ Guard phía client chỉ phục vụ trải nghiệm; chưa đăng nhập → `/
 | R-1 | `shared/*` không import `features/*` hoặc `app`. |
 | R-2 | `features/X` không import nội bộ `features/Y`; giao tiếp chéo feature bằng sự kiện UI (`citation:open`, `upload:request`) qua `app`. |
 | R-3 | Chỉ `shared/api` gọi `fetch`; chỉ `shared/realtime` mở kênh SSE workspace. |
-| R-4 | Chỉ `shared/lib/markdown` được chuyển nội dung LLM thành DOM; cấm `dangerouslySetInnerHTML` nơi khác. |
+| R-4 | Chỉ `shared/lib/markdown` được chuyển nội dung LLM thành DOM; cấm `v-html`/`innerHTML` nơi khác. |
 | R-5 | `pdfjs-dist` chỉ import động trong `features/source-viewer`. |
 | R-6 | Chỉ `shared/lib/analytics` gửi analytics, qua danh sách trắng thuộc tính (không chứa nội dung). |
 
@@ -220,7 +220,7 @@ classDiagram
 | Dữ liệu | Nơi lưu | Vòng đời / bảo vệ |
 |---|---|---|
 | Phiên đăng nhập | Cookie `HttpOnly; Secure; SameSite=Strict` | 8 giờ không thao tác; **không** lưu token trong `localStorage` (DD-03) |
-| Tài liệu, hội thoại, tin nhắn, báo cáo | Bộ nhớ (cache TanStack Query) | Xóa toàn bộ khi đăng xuất / 401 / `session.revoked`; không ghi storage bền |
+| Tài liệu, hội thoại, tin nhắn, báo cáo | Bộ nhớ (cache TanStack Query / store Pinia) | Xóa toàn bộ khi đăng xuất / 401 / `session.revoked`; không ghi storage bền |
 | Bản nháp câu hỏi | `sessionStorage` `draft:{userId}:{conversationId}` | Ghi khi gõ (debounce 500 ms); khôi phục sau đăng nhập lại; xóa khi gửi hoặc đăng xuất; không đưa vào analytics (cần ATTT chấp thuận — OQ-UX-02) |
 | PDF đang xem | Bộ nhớ (pdf.js) | Giải phóng khi đóng bảng; `Cache-Control: no-store` |
 | Mật khẩu tạm (Admin) | State hộp thoại | Hiển thị một lần; không log |
@@ -492,7 +492,7 @@ Chỉ mô tả các thuật toán phía client có logic không tầm thường.
 1. Mở `fetch` POST, đọc `ReadableStream`, tách sự kiện SSE theo dòng trống.
 2. `delta`: đưa vào bộ đệm; mỗi `requestAnimationFrame` gộp bộ đệm, nối vào nội dung và render lại **chỉ khối Markdown cuối cùng**.
 3. Đặt bộ đếm hủy 30 s, đặt lại sau mỗi sự kiện; hết hạn → hủy stream, trạng thái `TimedOut`.
-4. Render: Markdown → `rehype-sanitize` (danh sách trắng: đoạn, danh sách, nhấn mạnh, bảng, code; không ảnh, không HTML thô, link thành văn bản) → thay token `[n]` bằng `CitationChip` **chỉ khi** đã nhận sự kiện `citation` có `index = n`; chưa có thì hiển thị văn bản thường.
+4. Render: Markdown (`markdown-it`, `html: false`) → DOMPurify (danh sách trắng: đoạn, danh sách, nhấn mạnh, bảng, code; không ảnh, không HTML thô, link thành văn bản) → thay token `[n]` bằng `CitationChip` **chỉ khi** đã nhận sự kiện `citation` có `index = n`; chưa có thì hiển thị văn bản thường.
 5. Stream kết thúc: có `done` → trạng thái theo `answer_type`; không có `done` → `Interrupted`.
 
 **ALG-02 — Kiểm tra file phía client** (CN-04; DD-04)

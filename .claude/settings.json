@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw -B verify)",
+      "Bash(grep -E \"Tests run: [0-9]+, Fail.*$|BUILD|Total bugs|\\\\[ERROR\\\\]|You have [0-9]+ Checkstyle\" target/verify.log)",
+      "PowerShell(& \".\\\\ops\\\\scripts\\\\up.ps1\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -File ops/scripts/up.ps1)",
+      "Bash(node \"C:/Users/Faker/AppData/Local/Temp/claude/d--Learning-AI-SDLC-sdlc-project-chat-vs-document/233a6dac-3204-49ec-9a21-c56798012569/scratchpad/bom.cjs\")",
+      "Bash(grep -vE '^\\\\s*$' \"C:/Users/Faker/AppData/Local/Temp/claude/d--Learning-AI-SDLC-sdlc-project-chat-vs-document/233a6dac-3204-49ec-9a21-c56798012569/scratchpad/api-run.log\")",
+      "Bash(seq 1 120)",
+      "Bash(curl -s localhost:8080/healthz)",
+      "Bash(grep -qE 'APPLICATION FAILED|BUILD FAILURE|RemoteException' C:/Users/Faker/AppData/Local/Temp/claude/d--Learning-AI-SDLC-sdlc-project-chat-vs-document/233a6dac-3204-49ec-9a21-c56798012569/scratchpad/api-run.log)",
+      "Bash(curl -si localhost:8080/healthz)",
+      "Bash(wc -l C:/Users/Faker/AppData/Local/Temp/claude/d--Learning-AI-SDLC-sdlc-project-chat-vs-document/233a6dac-3204-49ec-9a21-c56798012569/scratchpad/api-run.log)",
+      "Bash(grep -vE '^\\\\s*$' C:/Users/Faker/AppData/Local/Temp/claude/d--Learning-AI-SDLC-sdlc-project-chat-vs-document/233a6dac-3204-49ec-9a21-c56798012569/scratchpad/api-run.log)"
+    ]
+  }
+}

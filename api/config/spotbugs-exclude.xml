@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Bean Spring/JPA nhận và trả tham chiếu có chủ đích (được container quản lý) -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- Ngoại lệ trong constructor là cách kiểm tra cấu hình bình thường của Spring -->
+  <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+  </Match>
+</FindBugsFilter>

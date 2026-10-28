@@ -18,7 +18,7 @@ Một thư viện `shared/ui` dùng chung để mọi màn hình nhất quán, t
 ## 3. Đặc tả chi tiết
 
 ### 3.1 Tokens (`src/shared/ui/tokens.css`)
-Định nghĩa bằng CSS variables, ánh xạ vào `tailwind.config` (không dùng mã màu cứng ngoài file này; thêm luật lint cấm `#rrggbb` trong `src/**/*.tsx|css` trừ `tokens.css`).
+Định nghĩa bằng CSS variables, ánh xạ vào `tailwind.config` (không dùng mã màu cứng ngoài file này; thêm luật lint cấm `#rrggbb` trong `src/**/*.vue|ts|css` trừ `tokens.css`).
 
 | Nhóm | Token (đúng giá trị SDD 3.4) |
 |---|---|
@@ -37,8 +37,8 @@ Mỗi component: TypeScript props rõ ràng, `forwardRef`, đủ trạng thái h
 | `Button` | variant `primary / secondary / danger / ghost`, size `sm / md`, prop `loading` (spinner, vô hiệu hóa, `aria-busy`); chiều cao ≥ 36 px (≥ 44 px khi `pointer: coarse`) |
 | `IconButton` | **bắt buộc** prop `label` → `aria-label`; 32×32 px (44 px khi coarse) |
 | `Input`, `Textarea` | nhãn gắn bằng `htmlFor`, prop `error` → `aria-invalid` + `aria-describedby`; viền `border-strong` |
-| `Dialog` | Radix; tiêu đề + mô tả, bẫy focus, Esc đóng, trả focus; biến thể xác nhận (nút chính `danger` khi phá hủy) |
-| `Menu` / `Popover` | Radix; điều hướng mũi tên, `role="menu"` |
+| `Dialog` | Reka UI (Radix Vue); tiêu đề + mô tả, bẫy focus, Esc đóng, trả focus; biến thể xác nhận (nút chính `danger` khi phá hủy) |
+| `Menu` / `Popover` | Reka UI; điều hướng mũi tên, `role="menu"` |
 | `Tooltip` | hiện khi hover **và** focus; không là cách duy nhất truyền thông tin |
 | `Toast` + `ToastRegion` | API `toast.show(text)` / `toast.error(text)`; tối đa 3, thông tin tự ẩn sau 5 s, lỗi giữ đến khi đóng; `aria-live="polite"` (lỗi: `assertive`) |
 | `Badge` | `neutral / success / warning / danger / info` |
@@ -51,10 +51,10 @@ Mỗi component: TypeScript props rõ ràng, `forwardRef`, đủ trạng thái h
 Route chỉ bật ở môi trường dev: `/dev/ui` liệt kê mọi component ở mọi trạng thái (kể cả lỗi, disabled). Dùng làm đích cho kiểm thử a11y và duyệt thiết kế.
 
 ### 3.4 Quy ước
-Không import Radix trực tiếp ngoài `shared/ui`. Văn bản mặc định của component đến từ props/i18n, không hard-code tiếng Việt trong component dùng chung.
+Không import Reka UI trực tiếp ngoài `shared/ui`. Văn bản mặc định của component đến từ props/i18n, không hard-code tiếng Việt trong component dùng chung.
 
 ## 4. Tệp sẽ tạo
-`shared/ui/tokens.css`, `shared/ui/fonts/*.woff2`, `shared/ui/components/*.tsx` (+ `*.test.tsx`), `shared/ui/index.ts`, `app/dev/UiShowcase.tsx`, cấu hình Tailwind, luật lint cấm màu cứng.
+`shared/ui/tokens.css`, `shared/ui/fonts/*.woff2`, `shared/ui/components/*.vue` (+ `*.test.ts`), `shared/ui/index.ts`, `app/dev/UiShowcase.vue`, cấu hình Tailwind, luật lint cấm màu cứng.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] Tokens khớp bảng 3.1; có test đọc `tokens.css` kiểm tra các giá trị màu chính xác.
@@ -66,7 +66,14 @@ Không import Radix trực tiếp ngoài `shared/ui`. Văn bản mặc định c
 - [ ] Giao diện trình diễn khớp prototype (nút, thẻ, thông báo, thanh tiến trình).
 
 ## 6. Kiểm thử
-Vitest + Testing Library cho hành vi (đóng hộp thoại bằng Esc, toast tự ẩn/giữ lỗi, `loading` vô hiệu hóa nút); axe-core trên `/dev/ui`; test tương phản.
+Vitest + Vue Test Utils/Testing Library cho hành vi (đóng hộp thoại bằng Esc, toast tự ẩn/giữ lỗi, `loading` vô hiệu hóa nút); axe-core trên `/dev/ui`; test tương phản.
 
 ## 7. Ghi chú
 Giá trị token là mặc định đề xuất (OQ-UX-03); nếu Design Lead cung cấp nhận diện thương hiệu, chỉ đổi trong `tokens.css`.
+
+**Ghi chú khi hiện thực (2026-10-26):**
+- Vue không có `forwardRef`: component dạng ô nhập/nút `defineExpose({ el, focus })` để cha lấy phần tử DOM qua `ref`.
+- Văn bản mặc định (Hủy, Xác nhận, Đóng, Đang tải) lấy từ vue-i18n (`src/locales/vi`, khóa `ui.*`); props ghi đè được.
+- Font Inter tự host trong `shared/ui/fonts/` chỉ 3 subset latin, latin-ext, vietnamese (giấy phép OFL kèm theo).
+- axe-core chạy trên `/dev/ui` trong jsdom (`UiShowcase.test.ts`); jsdom không tính màu nên `color-contrast` được kiểm bằng test tương phản trong `tokens.test.ts`. T21 chạy lại axe trong trình duyệt thật.
+- Cấm mã màu cứng: luật ESLint (`Literal`/`TemplateElement` trong script) + test quét toàn bộ `.vue/.ts/.css` (bắt cả `<template>`/`<style>`).

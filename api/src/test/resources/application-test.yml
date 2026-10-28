@@ -1,0 +1,20 @@
+app:
+  storage-dir: target/test-storage
+  embedding:
+    provider: fake
+  llm:
+    provider: fake
+    # Kịch bản "cham" im lặng 4 s > hạn 2 s → timeout nhanh trong test
+    first-token-timeout-s: 2
+    stream-stall-seconds: 4
+  sse:
+    heartbeat-seconds: 1
+    ping-seconds: 1
+  chat:
+    ping-seconds: 1
+    queue-wait-seconds: 1
+  processing:
+    retry-backoff-ms: 5
+springdoc:
+  api-docs:
+    enabled: true

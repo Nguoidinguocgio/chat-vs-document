@@ -17,28 +17,30 @@ Khung backend có cấu trúc rõ, xử lý lỗi theo một định dạng duy 
 
 ## 3. Đặc tả chi tiết
 
-### 3.1 Cấu trúc `api/app/`
+### 3.1 Cấu trúc `api/src/main/java/com/chatvsdoc/api/`
 ```
-main.py            tạo FastAPI, gắn router, middleware, xử lý lỗi
-core/              config.py (pydantic-settings), errors.py, security.py, logging.py
-db/                session.py, models.py, migrations/ (Alembic)
-routers/           auth.py, documents.py, events.py, chat.py, citations.py, analytics.py
-services/          auth, documents, pdf_pipeline, retrieval, answering, events, audit, analytics
-ports/             storage.py, embedding.py, llm.py  (+ adapters/ và fakes/)
-cli.py             create-user, disable-user, search (T12)
+ChatVsDocApplication.java   @SpringBootApplication
+config/            AppProperties (@ConfigurationProperties), SecurityConfig, WebConfig, JacksonConfig
+common/            AppException, ErrorCode, GlobalExceptionHandler, RequestIdFilter, CsrfHeaderFilter, SecurityHeadersFilter
+domain/            entity/ (JPA) + repository/ (Spring Data JPA; truy vấn vector dùng JdbcTemplate/native query)
+web/               AuthController, DocumentController, EventsController, ChatController, CitationController, AnalyticsController
+service/           auth, documents, pdf pipeline, retrieval, answering, events, audit, analytics
+port/              StoragePort, EmbeddingPort, LlmPort  (+ port/adapter/ và test: port/fake/)
+cli/               CliRunner (profile `cli`): create-user, disable-user, search (T12)
+src/main/resources/ application.yml, db/migration/V1__init.sql (Flyway)
 ```
 
 ### 3.2 Lỗi chuẩn
-`AppError(code, status, message_key, details=None)`; một exception handler chuyển thành `{"error":{"code","message_key","details"}}`. Lỗi không lường trước → `500 INTERNAL_ERROR` với `message_key="errors.generic"`, ghi log đầy đủ (không kèm nội dung nghiệp vụ). Lỗi kiểm tra đầu vào của FastAPI (`RequestValidationError`) → `422 VALIDATION_ERROR` cùng định dạng.
+`AppException(code, status, messageKey, details)`; một `@RestControllerAdvice` (`GlobalExceptionHandler`) chuyển thành `{"error":{"code","message_key","details"}}`. Lỗi không lường trước → `500 INTERNAL_ERROR` với `message_key="errors.generic"`, ghi log đầy đủ (không kèm nội dung nghiệp vụ). Lỗi kiểm tra đầu vào của Bean Validation (`MethodArgumentNotValidException`, `ConstraintViolationException`, JSON sai định dạng) → `422 VALIDATION_ERROR` cùng định dạng. Mọi lỗi của Spring Security (401/403) và 404 mặc định cũng được ánh xạ về định dạng này (`AuthenticationEntryPoint`, `AccessDeniedHandler`).
 
-### 3.3 Middleware
-- **Request ID** (`X-Request-ID`, sinh nếu thiếu) đưa vào mọi dòng log.
-- **CSRF nhẹ:** với POST/PUT/PATCH/DELETE, thiếu `X-Requested-With: fetch` → `403 FORBIDDEN`.
+### 3.3 Middleware (Servlet `Filter` / `OncePerRequestFilter`)
+- **Request ID** (`X-Request-ID`, sinh nếu thiếu) đưa vào mọi dòng log qua MDC.
+- **CSRF nhẹ:** với POST/PUT/PATCH/DELETE, thiếu `X-Requested-With: fetch` → `403 FORBIDDEN` (tắt CSRF mặc định của Spring Security, dùng filter này kèm cookie `SameSite=Lax`).
 - **Security headers:** `Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Strict-Transport-Security` (khi có TLS).
-- **Log có cấu trúc** (JSON): chỉ ID, route, status, độ trễ; lọc bỏ body.
+- **Log có cấu trúc** (JSON, Logback + `logstash-logback-encoder`): chỉ ID, route, status, độ trễ; lọc bỏ body.
 
-### 3.4 Lược đồ CSDL (Alembic, migration đầu tiên)
-Bật extension `pgvector` và `citext`.
+### 3.4 Lược đồ CSDL (Flyway, migration đầu tiên `V1__init.sql`)
+Bật extension `vector` (pgvector) và `citext`. Kiểu enum dùng `CREATE TYPE` của PostgreSQL, ánh xạ trong JPA bằng `@Enumerated(EnumType.STRING)` + `@JdbcType(PostgreSQLEnumJdbcType.class)`; cột `vector` ánh xạ qua `pgvector-java` (`PGvector`).
 
 | Bảng | Cột chính |
 |---|---|
@@ -53,26 +55,26 @@ Bật extension `pgvector` và `citext`.
 | `audit_logs` | `id bigserial`, `ts`, `actor_user_id null`, `action text`, `target text null`, `result enum(success,failure)`; **chỉ INSERT** (thu hồi quyền UPDATE/DELETE của role ứng dụng) |
 | `events` | `id bigserial`, `ts`, `name text`, `user_id null`, `session_id null`, `props jsonb` |
 
-Ràng buộc: khóa ngoại có `ON DELETE` rõ ràng (`document_pages`, `chunks` xóa theo `documents`; `citations` giữ `document_id` kể cả khi tài liệu bị xóa mềm). `embedding` kích thước lấy từ `EMBEDDING_DIM` lúc chạy migration.
+Ràng buộc: khóa ngoại có `ON DELETE` rõ ràng (`document_pages`, `chunks` xóa theo `documents`; `citations` giữ `document_id` kể cả khi tài liệu bị xóa mềm). `embedding` kích thước lấy từ `EMBEDDING_DIM` lúc chạy migration (placeholder Flyway `${embeddingDim}`).
 
 ### 3.5 Port và bản giả
 | Port | Giao diện | Bản giả (test) |
 |---|---|---|
-| `StoragePort` | `put(key, stream) -> None`, `open(key) -> stream`, `size(key)`, `delete(key)` | lưu thư mục tạm |
-| `EmbeddingPort` | `embed(texts: list[str]) -> list[list[float]]` | `FakeEmbedding`: vector xác định theo băm từ khóa (cùng từ → gần nhau) |
-| `LLMPort` | `stream(messages) -> AsyncIterator[str]`, trả thêm `usage(input_tokens, output_tokens)`; ném `LLMTimeout`, `LLMRateLimited`, `LLMError` | `FakeLLM` (kịch bản — xem T13) |
+| `StoragePort` | `void put(String key, InputStream in)`, `InputStream open(String key)`, `long size(String key)`, `void delete(String key)` | lưu thư mục tạm |
+| `EmbeddingPort` | `List<float[]> embed(List<String> texts)` | `FakeEmbedding`: vector xác định theo băm từ khóa (cùng từ → gần nhau) |
+| `LlmPort` | `void stream(List<LlmMessage> messages, Consumer<String> onDelta)` trả `LlmUsage(inputTokens, outputTokens)`; ném `LlmTimeoutException`, `LlmRateLimitedException`, `LlmException` (hủy bằng `CancellationToken`/thread interrupt) | `FakeLlm` (kịch bản — xem T13) |
 Adapter thật chọn theo `EMBEDDING_PROVIDER`, `LLM_PROVIDER`; adapter thật cụ thể do T08/T13 hiện thực.
 
 Lưu trữ file: thư mục `STORAGE_DIR`, mã hóa khi lưu bằng **mã hóa ở mức đĩa/volume hoặc dịch vụ lưu trữ** (AC-060.1) — không mã hóa ở tầng ứng dụng để còn hỗ trợ `Range` (T17). Ghi rõ điều này trong README của `api/`.
 
 ### 3.6 CLI
-`python -m app.cli create-user --email --name --role --password` (băm argon2 qua `core/security.py`; đặt `must_change_password=true` nếu có `--temp`) · `disable-user --email`.
+`java -jar api.jar --spring.profiles.active=cli create-user --email … --name … --role … --password …` (hoặc `./mvnw spring-boot:run -Dspring-boot.run.arguments="create-user …"`); băm **Argon2id** qua `Argon2PasswordEncoder` (Spring Security) bọc trong `PasswordHasher`; đặt `must_change_password=true` nếu có `--temp` · `disable-user --email`. Script tiện dụng: `ops/scripts/create-user.ps1`.
 
 ## 4. Tệp sẽ tạo
-Toàn bộ cây ở 3.1, migration `0001_init.py`, `tests/conftest.py` (DB test, client, fixtures).
+Toàn bộ cây ở 3.1, migration `V1__init.sql`, `src/test/java/.../support/` (cấu hình Testcontainers dùng chung, `MockMvc`/client, fixtures).
 
 ## 5. Tiêu chí hoàn thành
-- [ ] `alembic upgrade head` tạo đủ bảng trên Postgres sạch; `alembic downgrade base` chạy được.
+- [ ] Flyway `migrate` tạo đủ bảng trên Postgres sạch; kịch bản `clean` + `migrate` lại chạy được (không dùng downgrade; mỗi migration về sau có script hoàn tác ghi chú nếu cần).
 - [ ] Mọi lỗi (404, 422, 500, `AppError`) trả đúng định dạng chuẩn — có test.
 - [ ] Yêu cầu POST thiếu `X-Requested-With` → 403; GET không bị ảnh hưởng.
 - [ ] Header bảo mật có mặt trong mọi phản hồi (test).
@@ -82,7 +84,16 @@ Toàn bộ cây ở 3.1, migration `0001_init.py`, `tests/conftest.py` (DB test,
 - [ ] Các port có bản giả và test hợp đồng cho từng port.
 
 ## 6. Kiểm thử
-pytest với Postgres thật (container); test migration lên/xuống; test middleware và xử lý lỗi.
+JUnit 5 + Spring Boot Test với Postgres thật (Testcontainers, image `pgvector/pgvector:pg16`); test migration từ DB trống; test filter và xử lý lỗi bằng `MockMvc`.
 
 ## 7. Ghi chú
 `EMBEDDING_DIM` phải chốt trước khi chạy migration vì đổi sau sẽ cần tạo lại cột và tính lại toàn bộ vector. Chốt cùng việc #1 ở kế hoạch.
+
+**Ghi chú khi hiện thực (2026-10-26):**
+- `audit_logs` chỉ-INSERT bằng **trigger** (chặn UPDATE/DELETE/TRUNCATE, có hiệu lực cả với chủ bảng/superuser) cộng `REVOKE`; vì vậy `audit_logs.actor_user_id` không có khóa ngoại (`ON DELETE SET NULL` là một UPDATE).
+- `citations.chunk_id` `ON DELETE SET NULL`; `citations.document_id` `ON DELETE RESTRICT` (xóa mềm không ảnh hưởng, xóa cứng tài liệu còn được trích dẫn bị chặn).
+- Cột `chunks.embedding` không ánh xạ JPA; đọc/ghi qua `ChunkVectorRepository` (JdbcTemplate + `PGvector`).
+- `citext` chỉ không phân biệt hoa/thường khi tham số cũng là `citext`: `UserRepository.findByEmail` ép kiểu tường minh.
+- Bản giả `FakeEmbedding`/`FakeLlm` đặt ở mã chính (`port/fake/`) để chọn được bằng `*_PROVIDER=fake` khi chạy E2E, không chỉ trong test. Bean embedding/LLM là `@Lazy` để ứng dụng khởi động được trước khi có adapter thật (T08/T13).
+- CLI: thiếu `--name`/`--password` thì đọc `CLI_NAME`/`CLI_PASSWORD` — trên Windows JVM làm hỏng tiếng Việt trong đối số dòng lệnh; `create-user.ps1` dùng cách này và chạy `java -jar` trực tiếp.
+- Thêm mã lỗi chung `METHOD_NOT_ALLOWED` 405, `PAYLOAD_TOO_LARGE` 413, `UNSUPPORTED_MEDIA_TYPE` 415 (cần bổ sung vào hợp đồng ở T06).

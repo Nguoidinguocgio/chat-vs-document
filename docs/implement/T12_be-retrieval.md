@@ -18,25 +18,26 @@ Từ câu hỏi, lấy ra **một tập đoạn văn có thứ tự** từ **m�
 ## 3. Đặc tả chi tiết
 
 ### 3.1 Giao diện
-```python
-@dataclass
-class ContextBlock:
-    n: int                # 1..k, theo điểm giảm dần — đúng số dùng làm [n] trong câu trả lời
-    document_id: UUID
-    document_name: str
-    page: int
-    chunk_id: UUID
-    char_start: int
-    char_end: int
-    text: str
-    score: float          # độ tương đồng cosine 0..1
+```java
+public record ContextBlock(
+    int n,               // 1..k, theo điểm giảm dần — đúng số dùng làm [n] trong câu trả lời
+    UUID documentId,
+    String documentName,
+    int page,
+    UUID chunkId,
+    int charStart,
+    int charEnd,
+    String text,
+    double score) {}     // độ tương đồng cosine 0..1
 
-class Retriever:
-    async def search(self, question: str) -> list[ContextBlock]: ...
+@Service
+public class Retriever {
+    public List<ContextBlock> search(String question) { ... }
+}
 ```
 
 ### 3.2 Thuật toán
-1. Chuẩn hóa câu hỏi (trim, gộp khoảng trắng); vector hóa bằng `EmbeddingPort.embed_query`.
+1. Chuẩn hóa câu hỏi (trim, gộp khoảng trắng); vector hóa bằng `EmbeddingPort.embedQuery`.
 2. Truy vấn pgvector, **chỉ** tài liệu `status='ready' AND deleted_at IS NULL`:
    ```sql
    SELECT c.id, c.document_id, d.name, c.page, c.char_start, c.char_end, c.text,
@@ -57,10 +58,10 @@ Việc hỏi tiếng Việt trên tài liệu tiếng Anh (và ngược lại) d
 Mục tiêu ≤ 300 ms với workspace đầy (20 tài liệu × 100 trang ≈ 6.000–10.000 chunk) — chỉ mục HNSW đã tạo ở T03. Ghi `retrieval_ms` vào log có cấu trúc (không kèm nội dung).
 
 ### 3.5 Công cụ dòng lệnh để chỉnh tham số
-`python -m app.cli search "câu hỏi" [--k 8] [--min-score 0.3]` in ra danh sách (n, điểm, tài liệu, trang, 120 ký tự đầu của đoạn) — dùng khi chỉnh `TOP_K`/`MIN_SCORE` cùng T20. Không in toàn bộ văn bản vào log hệ thống.
+`java -jar api.jar --spring.profiles.active=cli search "câu hỏi" [--k 8] [--min-score 0.3]` (hoặc `ops/scripts/search.ps1`) in ra danh sách (n, điểm, tài liệu, trang, 120 ký tự đầu của đoạn) — dùng khi chỉnh `TOP_K`/`MIN_SCORE` cùng T20. Không in toàn bộ văn bản vào log hệ thống.
 
 ## 4. Tệp sẽ tạo
-`services/retrieval.py`, `cli.py` (lệnh `search`), `tests/test_retrieval_*.py`.
+`service/Retriever.java` (+ `ChunkSearchRepository` dùng `JdbcTemplate`/native query với toán tử `<=>` của pgvector), `cli/CliRunner.java` (lệnh `search`), `src/test/java/.../RetrieverIT.java`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] Chỉ trả đoạn của tài liệu `ready` chưa xóa (test: thêm tài liệu `processing`/`failed`/xóa mềm có nội dung khớp → không xuất hiện).
@@ -75,7 +76,12 @@ Mục tiêu ≤ 300 ms với workspace đầy (20 tài liệu × 100 trang ≈ 6
 - [ ] `cli search` chạy được và hiển thị đúng thông tin.
 
 ## 6. Kiểm thử
-pytest + Postgres thật, vector dựng bằng `FakeEmbedding` có kiểm soát (đặt khoảng cách biết trước); test tham số `k`, ngưỡng, cap theo tài liệu, khử trùng lặp.
+JUnit 5 + Postgres thật (Testcontainers), vector dựng bằng `FakeEmbedding` có kiểm soát (đặt khoảng cách biết trước); test tham số `k`, ngưỡng, cap theo tài liệu, khử trùng lặp.
 
 ## 7. Ghi chú
 `RETRIEVAL_MIN_SCORE` phụ thuộc mô hình embedding — **bắt buộc** hiệu chỉnh lại khi đổi mô hình. Đặt trong cấu hình, không hard-code. Tránh đặt quá cao: sẽ từ chối nhầm câu hỏi có đáp án (làm giảm TH-05).
+
+**Ghi chú khi hiện thực (2026-10-28):**
+- `Retriever`: 30 ứng viên HNSW → tối đa 4 đoạn/tài liệu, ngưỡng tương đối 0,6 × điểm cao nhất, khử trùng lặp (> 50 % chồng lấn cùng trang), giới hạn ~24.000 ký tự ngữ cảnh. Log chỉ có `retrieval_ms` và số đoạn.
+- Đo p90 trên ~6.000 đoạn (Testcontainers, pgvector HNSW): **84 ms** (mục tiêu ≤ 300 ms).
+- CLI kiểm thử thủ công: `search "câu hỏi" [--k N] [--min-score S]`.

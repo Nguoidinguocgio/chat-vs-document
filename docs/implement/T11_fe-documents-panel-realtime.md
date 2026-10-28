@@ -45,13 +45,13 @@ Trạng thái `panel: 'closed' | 'documents' | 'source'` (T18 dùng `source`). M
 - Toast `documents.first_ready_toast` ("Đã sẵn sàng. Hãy đặt câu hỏi.") khi tài liệu **đầu tiên** của workspace chuyển `ready` (so sánh số tài liệu `ready` trước và sau).
 
 ### 3.4 Tóm tắt trạng thái tài liệu cho ô nhập (ST-04, phần liên quan tài liệu)
-Hook `useDocumentsSummary()` trả `{total, ready, processing, failed, hasReady}` (tính cả `UploadTask` đang tải vào `processing`). T15 dùng hook này để quyết định `no_documents | processing_only | all_failed`.
+Composable `useDocumentsSummary()` trả `{total, ready, processing, failed, hasReady}` (tính cả `UploadTask` đang tải vào `processing`). T15 dùng composable này để quyết định `no_documents | processing_only | all_failed`.
 
 ### 3.5 Trạng thái trống của khu chat (CMP-09, phần tài liệu)
 `EmptyWorkspaceState` hiển thị theo `useDocumentsSummary()` (đúng ba biến thể prototype): chưa có tài liệu (lời dẫn + nút "Tải lên" + giới hạn), chỉ có đang xử lý (`chat.all_processing`), tất cả lỗi (`chat.all_failed` + nút mở bảng Tài liệu). Component này được T15 đặt vào `MessageList` khi chưa có tin nhắn.
 
 ## 4. Tệp sẽ tạo
-`shared/realtime/{workspaceEvents.ts, leader.ts}`, `app/RightPanel.tsx` + store, `features/documents/{DocumentsPanel,DocumentRow,DocumentStatus,EmptyWorkspaceState,useDocuments,useDocumentsSummary,api}.ts(x)`, `*.test.tsx`.
+`shared/realtime/{workspaceEvents.ts, leader.ts}`, `app/RightPanel.vue` + store (Pinia), `features/documents/{DocumentsPanel.vue,DocumentRow.vue,DocumentStatus.vue,EmptyWorkspaceState.vue,useDocuments.ts,useDocumentsSummary.ts,api.ts}`, `*.test.ts`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-011.1: danh sách hiển thị đủ tên, số trang, người tải, thời điểm, trạng thái; file lỗi kèm lý do đúng văn bản AC-012.x (kiểm tra từng `error_code`).
@@ -68,7 +68,12 @@ Hook `useDocumentsSummary()` trả `{total, ready, processing, failed, hasReady}
 - [ ] Lint R-3: chỉ `shared/realtime` dùng `EventSource`.
 
 ## 6. Kiểm thử
-Vitest + MSW (SSE giả, ngắt/đóng, `resync`); Testing Library cho từng biến thể `DocumentRow`; Playwright hai ngữ cảnh trình duyệt cho đồng bộ (cùng T21).
+Vitest + MSW (SSE giả, ngắt/đóng, `resync`); Vue Test Utils/Testing Library cho từng biến thể `DocumentRow`; Playwright hai ngữ cảnh trình duyệt cho đồng bộ (cùng T21).
 
 ## 7. Ghi chú
 Thời điểm "hôm nay/hôm qua" tính theo múi giờ `Asia/Ho_Chi_Minh`. Dữ liệu `uploaded_at` từ máy chủ là UTC.
+
+**Ghi chú khi hiện thực (2026-10-28):**
+- Kênh SSE `/api/events` ở `shared/realtime/workspaceEvents.ts`: chỉ một tab giữ kết nối (Web Locks `cvd-sse-leader`) và chia sự kiện qua `BroadcastChannel`; kết nối lại 1 s·2ⁿ (tối đa 30 s, ±20 %), sau khi nối lại phát `resync` để làm mới danh sách. `VITE_POLL_FALLBACK=true` bật thăm dò dự phòng (OQ-UX-02).
+- `session.revoked` → đăng xuất về `/login?reason=revoked`; thêm cờ `leaving` trong `app/session.ts` để lỗi 401 của các truy vấn khác không ghi đè lý do chuyển trang.
+- Bảng Tài liệu mở sẵn lần đầu ở màn hình ≥ 1280 px; toast "đã sẵn sàng" chỉ cho tài liệu ready ĐẦU TIÊN của workspace.

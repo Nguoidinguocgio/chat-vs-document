@@ -46,20 +46,20 @@ Chỉ người có tài khoản do Admin tạo mới truy cập được; phiên
 - `current_user` → trả `User` hoặc ném `UNAUTHENTICATED`/`SESSION_EXPIRED`.
 - `require_role(*roles)` → `403 FORBIDDEN`.
 - Khi `must_change_password=true`: mọi endpoint **trừ** `/me`, `/auth/logout`, `/auth/change-password` trả `403 PASSWORD_CHANGE_REQUIRED` (AC-001.4).
-- Hàm `revoke_user_sessions(user_id)` dùng cho vô hiệu hóa; sau khi T09 xong sẽ phát `session.revoked`.
+- Phương thức `SessionService.revokeUserSessions(userId)` dùng cho vô hiệu hóa; sau khi T09 xong sẽ phát `session.revoked`.
 
 ### 3.5 Chính sách mật khẩu
-≥ 10 ký tự, có ít nhất một chữ cái và một chữ số; mật khẩu mới ≠ mật khẩu hiện tại. Băm **argon2id** (tham số mặc định của `argon2-cffi`), `needs_rehash` được kiểm tra khi đăng nhập. Không bao giờ ghi mật khẩu vào log.
+≥ 10 ký tự, có ít nhất một chữ cái và một chữ số; mật khẩu mới ≠ mật khẩu hiện tại. Băm **argon2id** (`Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()` của Spring Security, cần `bcprov`), `upgradeEncoding()` được kiểm tra khi đăng nhập. Không bao giờ ghi mật khẩu vào log.
 
 ## 4. Tệp sẽ tạo
-`routers/auth.py`, `services/auth.py`, `core/security.py` (băm, token), `deps.py` (`current_user`, `require_role`), `tests/test_auth_*.py`.
+`web/AuthController.java`, `service/AuthService.java`, `config/SecurityConfig.java` + `SessionAuthFilter.java` (đọc cookie `sid`, nạp người dùng vào `SecurityContext`; phân quyền bằng `@PreAuthorize("hasRole('ADMIN')")`), `PasswordHasher.java` / `TokenGenerator.java` (băm, token), `AuthControllerIT.java`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-001.1: đăng nhập đúng → `200` + cookie; `GET /me` trả đúng người.
 - [ ] AC-001.2: sai email hoặc sai mật khẩu cho **cùng** phản hồi (cùng mã, cùng thông điệp, thời gian chênh lệch không đáng kể).
 - [ ] AC-001.3: 5 lần sai liên tiếp trong 15 phút → lần thứ 6 nhận `423` với `retry_after_s`; sau 15 phút đăng nhập lại được.
 - [ ] AC-001.4: tài khoản `must_change_password` bị chặn mọi API khác bằng `PASSWORD_CHANGE_REQUIRED` cho tới khi đổi mật khẩu đạt chính sách.
-- [ ] AC-001.5: phiên không thao tác 8 giờ → `401 SESSION_EXPIRED` (test bằng đồng hồ giả).
+- [ ] AC-001.5: phiên không thao tác 8 giờ → `401 SESSION_EXPIRED` (test bằng `Clock` giả).
 - [ ] AC-001.6: gọi bất kỳ endpoint bảo vệ nào không có cookie → `401`, không trả dữ liệu.
 - [ ] AC-003.1/003.2: vô hiệu hóa người dùng → phiên đang có mất hiệu lực ở yêu cầu kế tiếp; đăng nhập đúng mật khẩu nhận `ACCOUNT_DISABLED`.
 - [ ] Cookie có đủ cờ `HttpOnly`, `Secure`, `SameSite=Strict` (test header).
@@ -67,7 +67,13 @@ Chỉ người có tài khoản do Admin tạo mới truy cập được; phiên
 - [ ] Nhật ký đăng nhập ghi đúng thời điểm, người, kết quả; không chứa mật khẩu.
 
 ## 6. Kiểm thử
-pytest cho từng AC trên; kiểm thử đồng thời (nhiều lần đăng nhập sai song song không vượt bộ đếm sai); đồng hồ giả (freezegun) cho hết hạn và khóa.
+JUnit 5 + `MockMvc`/Testcontainers cho từng AC trên; kiểm thử đồng thời (nhiều lần đăng nhập sai song song không vượt bộ đếm sai — dùng `ExecutorService`, cập nhật đếm nguyên tử trong SQL); `java.time.Clock` giả cho hết hạn và khóa.
 
 ## 7. Ghi chú
 Không có "quên mật khẩu qua email" trong MVP (D-007); Admin đặt lại (US-004, làm sau). Cần kênh an toàn để giao mật khẩu tạm (ASM-103).
+
+**Ghi chú khi hiện thực (2026-10-27):**
+- Vô hiệu hóa (`revokeUserSessions`) **xóa phiên ngay**, nên yêu cầu kế tiếp nhận `401 UNAUTHENTICATED` (cookie không còn khớp phiên). `401 SESSION_EXPIRED` chỉ xuất hiện khi phiên hết hạn rảnh hoặc người dùng bị vô hiệu hóa mà phiên còn sót. FE xử lý hai mã như nhau; thông báo "bị vô hiệu hóa" đến qua SSE `session.revoked` (`/login?reason=revoked`).
+- Cửa sổ 15 phút dùng cột mới `users.failed_window_start` (migration V2); bộ đếm tăng nguyên tử bằng một câu `UPDATE … RETURNING`.
+- Bản ghi `audit_logs` của lần đăng nhập thất bại lưu lý do (`invalid_credentials|locked|disabled`) ở cột `target` (bảng không có cột lý do riêng).
+- Cookie `Secure` tắt được bằng `SESSION_COOKIE_SECURE=false` (chỉ dev không HTTPS; trình duyệt vẫn nhận cookie Secure trên `http://localhost`).

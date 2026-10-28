@@ -58,11 +58,11 @@ Khung theo chuẩn: `event: <tên>\ndata: <JSON một dòng>\n\n`; có thể có
 ### 3.4 Công cụ
 - `contracts/openapi.yaml` (OpenAPI 3.1); mô tả SSE bằng `text/event-stream` + tiện ích mở rộng `x-sse-events` liệt kê sự kiện.
 - `openapi-typescript` → `web/src/shared/api/schema.ts` (script `npm run gen:api`); CI kiểm tra file sinh ra không lệch so với commit.
-- **Kiểm tra BE khớp hợp đồng:** test so sánh `app.openapi()` với hợp đồng cho các endpoint đã hiện thực (đường dẫn, phương thức, mã trạng thái, schema); dùng `schemathesis` (hoặc tương đương) chạy với các endpoint không phải SSE.
+- **Kiểm tra BE khớp hợp đồng:** test so sánh OpenAPI do `springdoc-openapi` sinh (`/v3/api-docs`) với hợp đồng cho các endpoint đã hiện thực (đường dẫn, phương thức, mã trạng thái, schema); dùng `swagger-request-validator` (hoặc `schemathesis` chạy ngoài JVM) để kiểm tra các endpoint không phải SSE.
 - **MSW (`web/src/mocks`):** handler cho mọi endpoint ở 3.2; dữ liệu mẫu lấy từ prototype (tài liệu HopDong_A…, câu trả lời có `[1][2]`). Chọn kịch bản bằng cookie/`localStorage` giả hoặc query `?mock=` ở môi trường dev: `answered`, `not_found`, `partial`, `interrupted`, `timeout`, `llm_error`, `empty_workspace`, `processing_only`, `all_failed`, `near_limit`. SSE giả dùng `ReadableStream` phát từng `delta` mỗi ~45 ms. Dùng chung cho Vitest và Playwright (mode mock).
 
 ## 4. Tệp sẽ tạo
-`contracts/openapi.yaml`, `web/src/shared/api/schema.ts` (sinh), `web/src/mocks/{handlers,data,sse}.ts`, `web/src/mocks/browser.ts` + `server.ts`, `api/tests/test_contract.py`.
+`contracts/openapi.yaml`, `web/src/shared/api/schema.ts` (sinh), `web/src/mocks/{handlers,data,sse}.ts`, `web/src/mocks/browser.ts` + `server.ts`, `api/src/test/java/.../ContractTest.java` (so khớp OpenAPI do `springdoc-openapi` sinh với `contracts/openapi.yaml`, hoặc dùng `swagger-request-validator` để kiểm tra phản hồi thật theo hợp đồng).
 
 ## 5. Tiêu chí hoàn thành
 - [ ] `openapi.yaml` hợp lệ (CI lint) và mô tả đủ mọi endpoint, schema, mã lỗi ở 3.1–3.2.
@@ -77,3 +77,9 @@ Test hợp đồng BE (trên); test MSW bằng Vitest (đọc luồng SSE giả 
 
 ## 7. Ghi chú
 Mọi thay đổi hợp đồng về sau đi qua PR sửa `openapi.yaml` trước, rồi mới sửa mã hai phía. Tên endpoint là đề xuất của SDD; nếu BE cần đổi, đổi ở đây một lần.
+
+**Ghi chú khi hiện thực (2026-10-27):**
+- `x-implemented-in` ghi task đã hiện thực từng endpoint. `ContractTest` (BE) kiểm route trong mã ⊆ hợp đồng (so với `/v3/api-docs`, chỉ bật ở profile test) và kiểm phản hồi thật theo JSON Schema 2020-12 của hợp đồng (networknt). Không dùng `swagger-request-validator` vì thư viện này chưa hỗ trợ đầy đủ OpenAPI 3.1.
+- Lint hợp đồng bằng Redocly (`redocly.yaml`): tắt `no-unused-components` vì schema sự kiện SSE được tham chiếu qua `x-sse-events`.
+- MSW dùng mẫu `*/api/...` để chạy được cả trên trình duyệt lẫn Node (Vitest). `npm run dev:mock` bật worker; mã giả không vào bản build production. Bộ phân tích SSE `shared/realtime/sseParser.ts` được viết ở đây để T16 dùng lại.
+- Bổ sung mã lỗi chung `METHOD_NOT_ALLOWED`, `PAYLOAD_TOO_LARGE`, `UNSUPPORTED_MEDIA_TYPE` (từ T03) vào mô tả `Error.code`.

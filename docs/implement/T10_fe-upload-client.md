@@ -29,7 +29,7 @@ Ví dụ: còn 2 chỗ, chọn 4 file hợp lệ → nhận 2 file đầu, từ 
 - `GlobalDropOverlay`: lắng nghe `dragenter/dragleave/dragover/drop` trên `window`; chỉ hiện khi `dataTransfer.types` có `Files`; dùng bộ đếm `dragenter/leave` để không nhấp nháy; thả file bất kỳ đâu → gọi cùng luồng với nút chọn file; mở bảng Tài liệu nếu đang đóng; `preventDefault` để trình duyệt không mở file.
 - Tiếp cận: nút "Chọn file" thao tác được bằng bàn phím; lớp phủ có `aria-hidden` và không bẫy focus.
 
-### 3.3 Hàng đợi tải lên (`features/documents/upload/queue.ts`, Zustand)
+### 3.3 Hàng đợi tải lên (`features/documents/upload/queue.ts`, Pinia)
 - Mỗi file: `UploadTask {localId, file, progress: 0–100, phase: 'queued'|'uploading'|'interrupted', attempts}`.
 - **Tối đa 2 task `uploading` đồng thời** (DD-09); còn lại `queued`.
 - Dùng `XMLHttpRequest` (cho `upload.onprogress`) gửi `POST /api/documents` multipart, trường `file`, header `X-Requested-With: fetch` (thư mục này được lint cho phép dùng XHR). Có thể tính SHA-256 bằng Web Crypto và gửi `X-Content-SHA256` (tùy chọn, bỏ qua nếu lỗi).
@@ -39,13 +39,13 @@ Ví dụ: còn 2 chỗ, chọn 4 file hợp lệ → nhận 2 file đầu, từ 
 - Đóng tab giữa chừng: task mất; file chưa tải xong không xuất hiện ở người khác (do chỉ máy chủ tạo bản ghi khi nhận đủ file).
 
 ### 3.4 Danh sách từ chối
-`rejections` (Zustand): mỗi mục `{id, fileName, messageKey}` hiển thị thành khối đỏ có `role="alert"`, "tên file: thông điệp" và nút ✕ để bỏ; không tự biến mất; tên file hiển thị qua `midEllipsis`.
+`rejections` (Pinia): mỗi mục `{id, fileName, messageKey}` hiển thị thành khối đỏ có `role="alert"`, "tên file: thông điệp" và nút ✕ để bỏ; không tự biến mất; tên file hiển thị qua `midEllipsis`.
 
 ### 3.5 Analytics
 Không gửi sự kiện từ client cho tải lên; EV-010/011/012/013 do máy chủ ghi (T07/T08). (Chỉ gửi header `X-Batch-Size` = số file nhận trong lần chọn để backend ghi `batch_size`.)
 
 ## 4. Tệp sẽ tạo
-`features/documents/upload/{validateFiles.ts, queue.ts, UploadDropzone.tsx, GlobalDropOverlay.tsx, RejectionList.tsx, useUpload.ts}` + `*.test.ts(x)`; mở rộng `mocks/handlers.ts` cho `409/413/400`, lỗi mạng, tải chậm.
+`features/documents/upload/{validateFiles.ts, queue.ts, UploadDropzone.vue, GlobalDropOverlay.vue, RejectionList.vue, useUpload.ts}` + `*.test.ts`; mở rộng `mocks/handlers.ts` cho `409/413/400`, lỗi mạng, tải chậm.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] `validateFiles`: test bảng gồm — `.docx`; `.pdf` giả (nội dung không có `%PDF-`); 10 MB và 10 MB + 1 byte; 18 tài liệu + 4 file; 20 tài liệu + 1 file; thứ tự chọn được giữ; file hỏng không chiếm chỗ.
@@ -60,7 +60,12 @@ Không gửi sự kiện từ client cho tải lên; EV-010/011/012/013 do máy 
 - [ ] Tên file dài/có dấu hiển thị rút gọn giữa, tooltip tên đầy đủ.
 
 ## 6. Kiểm thử
-Vitest (hàm thuần, hàng đợi với XHR giả/đồng hồ giả); Testing Library + MSW cho vùng kéo-thả; ghi chú các kịch bản để T21 chạy lại bằng Playwright với file thật.
+Vitest (hàm thuần, hàng đợi với XHR giả/đồng hồ giả); Vue Test Utils/Testing Library + MSW cho vùng kéo-thả; ghi chú các kịch bản để T21 chạy lại bằng Playwright với file thật.
 
 ## 7. Ghi chú
 Nếu đọc `file.slice(0,5).text()` lỗi (file bị chặn đọc), coi như không phải PDF hợp lệ và để máy chủ quyết định — không chặn ở client.
+
+**Ghi chú khi hiện thực (2026-10-28):**
+- Kiểm tra chữ ký `%PDF-` đọc bằng `FileReader` (jsdom không hỗ trợ ổn định `Blob.text()/arrayBuffer()`); đọc lỗi → để máy chủ quyết định như mục 7.
+- Hàng đợi tải lên là Pinia store `upload/queue.ts`: tối đa 2 file song song, tự thử lại lỗi mạng 3 lần (1 s · 2 s · 4 s); `X-Batch-Size` gửi kèm cho EV-010. XHR chỉ ở `features/documents/upload/**` (ngoại lệ R-3).
+- MSW: tên file chứa `netfail` → lỗi mạng, `slow` → chậm 4 s; `scan/error/pass/big/partial` → các mã lỗi xử lý tương ứng (dùng khi `npm run dev:mock`).

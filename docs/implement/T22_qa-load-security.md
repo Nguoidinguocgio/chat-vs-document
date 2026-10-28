@@ -33,7 +33,7 @@ Ghi nhận tài nguyên (CPU, RAM, kết nối DB, số kết nối SSE), chi ph
 **Tự động:**
 - **OWASP ZAP baseline + active scan** trên staging (đăng nhập bằng phiên được cấp); NFR-S01: 0 lỗ hổng High/Critical.
 - **Liệt kê toàn bộ route** từ `openapi.yaml` và gọi **không có cookie** → mọi endpoint (trừ `/auth/login`, `/healthz`) phải trả `401`; gọi **thiếu `X-Requested-With`** với POST/PUT/PATCH/DELETE → `403`.
-- `npm audit --omit=dev`, `pip-audit`, quét bí mật (`gitleaks`) — không có mức High chưa xử lý.
+- `npm audit --omit=dev`, OWASP `dependency-check-maven` (hoặc `mvn versions:display-dependency-updates`), quét bí mật (`gitleaks`) — không có mức High chưa xử lý.
 - Kiểm tra header: `Content-Security-Policy` (không `unsafe-inline` cho script, không `unsafe-eval`), `X-Content-Type-Options`, cờ cookie `HttpOnly; Secure; SameSite=Strict`, `Cache-Control: no-store` cho file PDF và API dữ liệu.
 
 **Thủ công/nửa tự động — danh sách bắt buộc:**

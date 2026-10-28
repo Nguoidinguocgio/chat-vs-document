@@ -1,0 +1,9 @@
+* text=auto
+# Script chạy trên Linux (CI) phải giữ LF
+mvnw text eol=lf
+*.sh text eol=lf
+Makefile text eol=lf
+# Script Windows
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.woff2 binary

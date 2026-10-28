@@ -1,0 +1,104 @@
+server:
+  port: ${PORT:8080}
+  error:
+    whitelabel:
+      enabled: false
+  tomcat:
+    # Ứng dụng dừng đọc ngay ở MAX_FILE_MB; Tomcat nuốt phần còn lại (tối đa 12 MB) để client nhận 413
+    max-swallow-size: 12MB
+
+spring:
+  application:
+    name: chat-vs-document-api
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/chatdoc}
+    username: ${DB_USER:chatdoc}
+    password: ${DB_PASSWORD:change-me}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  # Upload đọc theo luồng bằng commons-fileupload2 (T07) để dừng ngay khi vượt MAX_FILE_MB
+  servlet:
+    multipart:
+      enabled: false
+  flyway:
+    locations: classpath:db/migration
+    placeholders:
+      # Cố định số chiều cột chunks.embedding lúc chạy V1; đổi sau phải tạo lại cột và tính lại vector
+      embeddingDim: ${EMBEDDING_DIM:1024}
+  jackson:
+    time-zone: UTC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    # Chỉ bật khi cần đối chiếu với contracts/openapi.yaml (test hợp đồng bật trong profile test)
+    enabled: ${API_DOCS_ENABLED:false}
+
+app:
+  session-idle-hours: ${SESSION_IDLE_HOURS:8}
+  storage-dir: ${STORAGE_DIR:./storage}
+  max-docs: ${MAX_DOCS:20}
+  max-file-mb: ${MAX_FILE_MB:10}
+  max-pages: ${MAX_PAGES:100}
+  embedding:
+    provider: ${EMBEDDING_PROVIDER:ollama}
+    base-url: ${EMBEDDING_BASE_URL:http://localhost:11434}
+    model: ${EMBEDDING_MODEL:bge-m3}
+    dim: ${EMBEDDING_DIM:1024}
+  llm:
+    provider: ${LLM_PROVIDER:fake}
+    model: ${LLM_MODEL:claude-sonnet-5-5}
+    api-key: ${LLM_API_KEY:}
+    first-token-timeout-s: ${LLM_FIRST_TOKEN_TIMEOUT_S:30}
+    stream-stall-seconds: ${STREAM_STALL_SECONDS:31}
+    # Giới hạn độ dài câu trả lời. Đặc tả gợi ý ≈ 800; dùng 1500 vì tiếng Việt tốn token hơn tiếng Anh
+    # (bị cắt giữa câu tệ hơn tốn thêm vài trăm token).
+    max-tokens: ${LLM_MAX_TOKENS:1500}
+  retrieval:
+    top-k: ${RETRIEVAL_TOP_K:8}
+    min-score: ${RETRIEVAL_MIN_SCORE:0.30}
+  # Cờ Secure của cookie sid; chỉ tắt ở dev cục bộ không có HTTPS (SESSION_COOKIE_SECURE=false)
+  session-cookie-secure: ${SESSION_COOKIE_SECURE:true}
+  app-version: ${APP_VERSION:0.1.0}
+  sse:
+    heartbeat-seconds: 20
+    ping-seconds: 10
+    max-connections-per-user: 3
+    buffer-size: 500
+    buffer-minutes: 10
+  chat:
+    max-concurrent: ${CHAT_MAX_CONCURRENT:20}
+    per-user: 3
+    queue-wait-seconds: 10
+    ping-seconds: 10
+  processing:
+    workers: ${PROCESSING_WORKERS:2}
+    timeout-seconds: 120
+    orphan-minutes: 5
+    embedding-batch-size: 32
+    retry-backoff-ms: 1000
+    min-page-chars: 20
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cli
+  main:
+    web-application-type: none
+    banner-mode: off

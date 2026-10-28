@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!-- Định dạng do Spotless (google-java-format AOSP) lo; Checkstyle chỉ giữ các luật về chất lượng mã. -->
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+  <property name="severity" value="warning"/>
+  <module name="FileTabCharacter"/>
+  <module name="NewlineAtEndOfFile"/>
+  <module name="TreeWalker">
+    <module name="AvoidStarImport"/>
+    <module name="UnusedImports"/>
+    <module name="RedundantImport"/>
+    <module name="IllegalImport"/>
+    <module name="EmptyCatchBlock">
+      <property name="exceptionVariableName" value="expected|ignored"/>
+    </module>
+    <module name="EqualsHashCode"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="FallThrough"/>
+    <module name="OneStatementPerLine"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="NeedBraces"/>
+    <module name="StringLiteralEquality"/>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="TypeName"/>
+    <!-- Cho phép _ để tên test ghi mã tiêu chí chấp nhận, ví dụ ac012_3_tooManyPages -->
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+    </module>
+    <module name="PackageName">
+      <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+    </module>
+    <module name="UpperEll"/>
+    <module name="ModifierOrder"/>
+    <!-- Cấm in thẳng ra console trong mã chính; dùng logger (trừ CLI) -->
+    <module name="Regexp">
+      <property name="format" value="System\.(out|err)\.print"/>
+      <property name="illegalPattern" value="true"/>
+      <property name="message" value="Dùng logger thay cho System.out/err."/>
+    </module>
+  </module>
+  <module name="SuppressionSingleFilter">
+    <property name="files" value="[\\/]cli[\\/]"/>
+    <property name="checks" value="Regexp"/>
+  </module>
+</module>

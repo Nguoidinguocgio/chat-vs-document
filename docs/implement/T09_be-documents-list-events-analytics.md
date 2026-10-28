@@ -41,10 +41,10 @@ Body `{events: [{name, ts, props}]}`, tối đa 50 sự kiện/yêu cầu; trả
 - Máy chủ tự gắn `user_id`, `session_id` (từ phiên), `role`, `app_version`, `ts` máy chủ; lưu vào `events`. Timestamp từ client chỉ lưu thêm làm `props.client_ts`, tối đa lệch ±24 giờ.
 
 ### 3.4 Helper phía máy chủ
-`emit(name, user_id, **props)` ghi vào `events` bằng cùng bộ lọc danh sách trắng (bảng tên/thuộc tính nằm một chỗ: `services/analytics_schema.py`, gồm cả EV-001/002/010/011/012/013/020/023/024). T07, T08, T14 dùng chung.
+`emit(name, userId, Map<String,Object> props)` ghi vào `events` bằng cùng bộ lọc danh sách trắng (bảng tên/thuộc tính nằm một chỗ: `service/AnalyticsSchema.java`, gồm cả EV-001/002/010/011/012/013/020/023/024). T07, T08, T14 dùng chung.
 
 ## 4. Tệp sẽ tạo
-`routers/documents.py` (phần đọc), `routers/events.py`, `routers/analytics.py`, `services/events.py`, `services/analytics.py`, `services/analytics_schema.py`, `tests/test_events_*.py`.
+`web/DocumentController.java` (phần đọc), `web/EventsController.java` (`SseEmitter`), `web/AnalyticsController.java`, `service/EventService.java`, `service/AnalyticsService.java`, `service/AnalyticsSchema.java`, `EventsControllerIT.java`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-011.1: `GET /documents` trả đủ tên, số trang, người tải, thời điểm, trạng thái, lý do lỗi.
@@ -60,7 +60,13 @@ Body `{events: [{name, ts, props}]}`, tối đa 50 sự kiện/yêu cầu; trả
 - [ ] Người chưa đăng nhập: cả ba endpoint trả `401`.
 
 ## 6. Kiểm thử
-pytest với client SSE (httpx stream); đồng hồ giả cho heartbeat; kiểm thử đồng thời hai người dùng; kiểm thử rò rỉ tác vụ khi ngắt kết nối.
+JUnit 5 với client SSE (`java.net.http.HttpClient` đọc luồng); `Clock`/bộ lập lịch giả cho heartbeat; kiểm thử đồng thời hai người dùng; kiểm thử rò rỉ `SseEmitter`/thread khi ngắt kết nối (`onCompletion`/`onError`).
 
 ## 7. Ghi chú
 Nếu CNTT xác nhận proxy đệm SSE (OQ-UX-02), đây là nơi thêm phương án dự phòng (ví dụ cho phép client chuyển sang thăm dò `GET /documents` mỗi 5 giây khi `EventSource` lỗi liên tục). Quyết định cùng T11.
+
+**Ghi chú khi hiện thực (2026-10-27):**
+- Bus trong tiến trình (`InProcessEventBus`) giả định **một instance** backend (ghi trong `api/README.md`). Dữ liệu sự kiện tài liệu tính `can_delete` riêng cho từng người nhận.
+- Khi mở kết nối, máy chủ gửi ngay dòng `: connected` để header phản hồi được đẩy đi; tác vụ ping/heartbeat định kỳ bọc try/catch (một ngoại lệ thoát ra sẽ hủy mọi lần chạy sau của `ScheduledExecutor`) — hai lỗi này được phát hiện khi viết `EventsControllerIT`.
+- `Last-Event-ID` không phải số hoặc lớn hơn ID hiện tại (máy chủ đã khởi động lại) → `resync`.
+- Heartbeat/ping đọc từ cấu hình (`app.sse.*`; profile test đặt 1 s) thay cho đồng hồ giả.

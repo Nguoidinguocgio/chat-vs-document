@@ -36,15 +36,15 @@ Mọi từ chối (400/409/413) ghi analytics **EV-011** với `reason` ∈ `not
 Chỉ khi `status=failed` **và** `error_code=SYSTEM_ERROR`; ngược lại `409 NOT_RETRYABLE`. Đặt lại `status=processing`, xóa `error_code`, xếp hàng xử lý lại. Trả `202` `Document`. Mọi vai trò đã đăng nhập được thử lại tài liệu của workspace.
 
 ### 3.3 Hàng đợi xử lý nền
-MVP không cần Redis: dùng hàng đợi trong tiến trình (`asyncio.Queue` + N worker, mặc định N = 2; giới hạn CPU cho trích xuất). Bảng `documents` là nguồn sự thật:
-- Khi khởi động, tìm tài liệu `status=processing` và `uploaded_at` cũ hơn 5 phút (đã mồ côi do khởi động lại) → xếp hàng lại.
-- Giao diện `JobQueue.enqueue(document_id)` được tách riêng để sau này thay bằng hàng đợi ngoài mà không sửa nghiệp vụ.
+MVP không cần Redis: dùng hàng đợi trong tiến trình (`ThreadPoolExecutor` có N worker, mặc định N = 2, hoặc `ExecutorService` + `LinkedBlockingQueue`; giới hạn CPU cho trích xuất). Bảng `documents` là nguồn sự thật:
+- Khi khởi động (`ApplicationReadyEvent`), tìm tài liệu `status=processing` và `uploaded_at` cũ hơn 5 phút (đã mồ côi do khởi động lại) → xếp hàng lại.
+- Giao diện `JobQueue.enqueue(documentId)` được tách riêng để sau này thay bằng hàng đợi ngoài mà không sửa nghiệp vụ.
 
 ### 3.4 Bảo mật
-Chỉ lưu tệp ở `STORAGE_DIR` bằng khóa là UUID (chống path traversal); tên file người dùng không bao giờ ghép vào đường dẫn. Giới hạn kích thước body ở tầng ASGI/proxy ở mức hơi lớn hơn 10 MB để từ chối sớm. Không đọc toàn bộ file vào bộ nhớ (xử lý theo luồng).
+Chỉ lưu tệp ở `STORAGE_DIR` bằng khóa là UUID (chống path traversal); tên file người dùng không bao giờ ghép vào đường dẫn. Giới hạn kích thước body ở tầng Tomcat/proxy (`spring.servlet.multipart.max-file-size`/`max-request-size`, `server.tomcat.max-swallow-size`) ở mức hơi lớn hơn 10 MB để từ chối sớm. Không đọc toàn bộ file vào bộ nhớ (xử lý theo luồng).
 
 ## 4. Tệp sẽ tạo
-`routers/documents.py` (phần ghi), `services/documents.py`, `services/job_queue.py`, `tests/test_upload_*.py`, fixtures PDF nhỏ.
+`web/DocumentController.java` (phần ghi), `service/DocumentService.java`, `service/JobQueue.java` (interface) + `InProcessJobQueue.java`, `DocumentUploadIT.java`, fixtures PDF nhỏ.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-010.1: PDF hợp lệ ≤ 10 MB → `201`, trạng thái `processing`, bản ghi và file đã lưu.
@@ -60,7 +60,12 @@ Chỉ lưu tệp ở `STORAGE_DIR` bằng khóa là UUID (chống path traversal
 - [ ] Người chưa đăng nhập → `401`; thiếu `X-Requested-With` → `403`.
 
 ## 6. Kiểm thử
-pytest với Postgres thật cho cạnh tranh (dùng `asyncio.gather`); fixtures: PDF hợp lệ nhỏ, file giả đuôi `.pdf`, file 10 MB + 1; test khởi động lại bằng cách tạo bản ghi `processing` cũ.
+JUnit 5 với Postgres thật (Testcontainers) cho cạnh tranh (dùng `ExecutorService.invokeAll`/`CountDownLatch`); fixtures: PDF hợp lệ nhỏ, file giả đuôi `.pdf`, file 10 MB + 1; test khởi động lại bằng cách tạo bản ghi `processing` cũ.
 
 ## 7. Ghi chú
 Mã hóa khi lưu (AC-060.1) thực hiện ở mức đĩa/volume hoặc dịch vụ lưu trữ — xác nhận với CNTT; ghi lại bằng chứng cho An toàn thông tin.
+
+**Ghi chú khi hiện thực (2026-10-27):**
+- Multipart của Spring tắt; `DocumentController` đọc theo luồng bằng commons-fileupload2 và `LimitedCopy` dừng ngay khi vượt `MAX_FILE_MB`. `LimitedCopyTest` chứng minh với luồng vô hạn chỉ đọc ≤ giới hạn + 64 KB. Tomcat `max-swallow-size: 12MB` cho phép client nhận `413` gọn thay vì bị cắt kết nối.
+- Khóa lưu trữ `documents/<uuid ngẫu nhiên>.pdf` (không phải ID tài liệu, vì ID do JPA sinh lúc chèn). Bản ghi từ chối EV-011 và audit `failure` ghi lý do, không ghi tên file.
+- Test chạy đua: 20 vòng × 5 upload song song khi còn 1 chỗ → luôn đúng 1 × 201, 4 × 409, tổng = 20.

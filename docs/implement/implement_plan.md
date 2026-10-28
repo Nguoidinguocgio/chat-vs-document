@@ -37,7 +37,7 @@
 
 ```mermaid
 flowchart LR
-    B[Trình duyệt<br/>React SPA] -->|REST · SSE · multipart| API[Backend API]
+    B[Trình duyệt<br/>Vue SPA] -->|REST · SSE · multipart| API[Backend API]
     API --> DB[(PostgreSQL<br/>+ vector)]
     API --> FS[(Lưu file PDF<br/>mã hóa)]
     API -->|chỉ backend gọi| LLM[LLM đã phê duyệt]
@@ -45,11 +45,11 @@ flowchart LR
 
 | Tầng | Chọn **[Đề xuất]** | Ghi chú |
 |---|---|---|
-| Frontend | React 18 + TypeScript + Vite, TanStack Query, Radix UI + Tailwind, `pdfjs-dist`, `react-markdown` + `rehype-sanitize` | Theo SDD §1.2; tải lười pdf.js |
-| Backend | Một service REST + SSE; **Python (FastAPI)** hoặc ngăn xếp quen thuộc của đội | Python thuận tiện cho trích xuất PDF; đội quyết định ở việc #1 |
-| Dữ liệu | PostgreSQL + pgvector (một CSDL cho cả dữ liệu thường và vector) | Đủ cho 20 tài liệu; tránh thêm dịch vụ |
-| Xử lý PDF | Trích văn bản **từng trang** (PyMuPDF/pdfminer); không OCR (D-008) | Giữ số trang + vị trí ký tự cho trích dẫn |
-| Kiểm thử | Vitest, Playwright + axe-core, MSW (API giả), pytest | |
+| Frontend | **Vue 3** + TypeScript + Vite, Pinia, Vue Router, TanStack Query (vue-query), Reka UI + Tailwind, `pdfjs-dist`, `markdown-it` + DOMPurify | Theo SDD §1.2; tải lười pdf.js |
+| Backend | Một service REST + SSE; **Java 21 + Spring Boot 3** (Maven); SSE bằng `SseEmitter` trên virtual threads | Chốt theo môi trường PC của đội (việc #1) |
+| Dữ liệu | **PostgreSQL 16** + pgvector (một CSDL cho cả dữ liệu thường và vector), Flyway quản lý migration | Đủ cho 20 tài liệu; tránh thêm dịch vụ; cài native hoặc Docker |
+| Xử lý PDF | Trích văn bản **từng trang** (Apache PDFBox `PDFTextStripper`); không OCR (D-008) | Giữ số trang + vị trí ký tự cho trích dẫn |
+| Kiểm thử | Vitest + Vue Test Utils, Playwright + axe-core, MSW (API giả), JUnit 5 + Testcontainers | |
 
 **Mô hình dữ liệu tối thiểu:** `users` · `documents` (tên, số trang, trạng thái, lỗi, người tải) · `chunks` (document, trang, offset, văn bản, vector) · `conversations` · `messages` (câu hỏi, câu trả lời, kết quả: answered/not_found/partial/…) · `citations` (message, chỉ số, document, trang, vị trí đoạn).
 
@@ -65,7 +65,7 @@ Thời lượng ước tính cho **1 FE + 1 BE toàn thời gian và 1 QA bán t
 
 | GĐ | Nội dung | Thời lượng | Kết quả kiểm chứng được |
 |---|---|---|---|
-| **0** | Nền tảng | 1 tuần | Repo + CI; khung React với design tokens; CSDL; **đăng nhập tối thiểu** (cookie HttpOnly, tài khoản Admin tạo sẵn); API giả; chốt các việc ở mục 2 |
+| **0** | Nền tảng | 1 tuần | Repo + CI; khung Vue với design tokens; CSDL; **đăng nhập tối thiểu** (cookie HttpOnly, tài khoản Admin tạo sẵn); API giả; chốt các việc ở mục 2 |
 | **1** | **BB-01 Tải lên PDF** | 2 tuần | Tải lên → Đang xử lý → Sẵn sàng/Lỗi đúng lý do; giới hạn 20 file; cập nhật thời gian thực |
 | **2** | **BB-02 lõi hỏi đáp** | 2–3 tuần | Hỏi → câu trả lời streaming kèm `[n]` và danh sách nguồn; "không tìm thấy"; trả lời một phần |
 | **3** | Kiểm chứng và độ bền | 1–1,5 tuần | Xem đoạn gốc (US-030), Dừng/Tạo lại (US-026), xử lý gián đoạn/quá hạn/lỗi, hỏi chéo ngôn ngữ |

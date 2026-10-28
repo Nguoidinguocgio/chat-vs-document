@@ -23,7 +23,7 @@ Khung chat mà người dùng thấy ngay khi vào ứng dụng: biết rõ **đ
 - `useConversations()` = `GET /api/conversations` (làm mới sau khi gửi câu hỏi đầu tiên và khi quay lại tab).
 
 ### 3.2 `Composer` (CMP-07) và trạng thái ST-04
-Hook `useComposerState()` **suy ra** (không lưu) trạng thái theo thứ tự ưu tiên, gộp `navigator.onLine`, `useDocumentsSummary()` (T11), trạng thái câu trả lời hiện tại (T16 cung cấp `isAnswering`), nội dung ô nhập:
+Composable `useComposerState()` **suy ra** (không lưu) trạng thái theo thứ tự ưu tiên, gộp `navigator.onLine`, `useDocumentsSummary()` (T11), trạng thái câu trả lời hiện tại (T16 cung cấp `isAnswering`), nội dung ô nhập:
 
 | # | Điều kiện | Trạng thái | Trình bày |
 |---|---|---|---|
@@ -58,7 +58,7 @@ Nút "＋ Hội thoại mới" (→ `/c`, `Ctrl+Shift+O`); danh sách nhóm theo
 `/` (khi không ở trong ô nhập) → focus ô nhập · `Ctrl+Shift+O` → hội thoại mới · liên kết "Bỏ qua tới ô nhập câu hỏi" đã có từ T05 · thứ tự Tab: thanh trên → thanh trái → danh sách tin nhắn → ô nhập → bảng phải.
 
 ## 4. Tệp sẽ tạo
-`features/chat/{ChatPage, ChatPane, MessageList, Composer, useComposerState, Disclaimer, SuggestedQuestions, useConversationRoute}.tsx`, `features/conversations/{ConversationSidebar, useConversations}.tsx`, `*.test.tsx`.
+`features/chat/{ChatPage.vue, ChatPane.vue, MessageList.vue, Composer.vue, Disclaimer.vue, SuggestedQuestions.vue, useComposerState.ts, useConversationRoute.ts}`, `features/conversations/{ConversationSidebar.vue, useConversations.ts}`, `*.test.ts`.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-020.4: không có tài liệu `ready` → ô nhập vô hiệu hóa, hiển thị "Tải lên ít nhất một tài liệu PDF để bắt đầu hỏi" + nút "Tải lên"; ba biến thể `no_documents` / `processing_only` / `all_failed` đúng.
@@ -74,7 +74,13 @@ Nút "＋ Hội thoại mới" (→ `/c`, `Ctrl+Shift+O`); danh sách nhóm theo
 - [ ] Phím tắt hoạt động; axe-core 0 lỗi serious/critical; khớp prototype ở 1440 px và 1100 px.
 
 ## 6. Kiểm thử
-Vitest + Testing Library (hook `useComposerState` thuần, hành vi bàn phím/IME), MSW cho tải hội thoại; Playwright (T21) cho luồng nháp qua hết phiên.
+Vitest + Vue Test Utils/Testing Library (composable `useComposerState` thuần, hành vi bàn phím/IME), MSW cho tải hội thoại; Playwright (T21) cho luồng nháp qua hết phiên.
 
 ## 7. Ghi chú
 Tab thứ hai mở cùng hội thoại: mỗi tab độc lập; nếu một tab gửi câu hỏi thì tab kia chỉ thấy khi làm mới — chấp nhận ở MVP (PRD §5.2: hội thoại hoạt động độc lập).
+
+**Ghi chú khi hiện thực (2026-10-28):**
+- `Composer` chỉ khóa theo tài liệu **sau khi** danh sách tài liệu tải xong (tránh nháy trạng thái "chưa có tài liệu" và mất ký tự gõ sớm khi vừa đăng nhập lại).
+- Trạng thái câu trả lời dùng chung qua Pinia store `useAnswerStream` (giữ được khi URL đổi `/c` → `/c/:id`). Nút Dừng tạm thời hủy luồng phía client (máy chủ ghi `stopped`); T19 thay bằng `POST /messages/{id}/stop`.
+- Sidebar dùng `<a href>` + điều hướng router; skeleton chỉ hiện khi tải > 300 ms. Hội thoại không tồn tại/của người khác hiển thị "Không tìm thấy hội thoại" ngay trong khung chat (feature không được import `ErrorPage` của `app`).
+- Chưa đối chiếu điểm ảnh với prototype ở 1440/1100 px bằng trình duyệt thật — để T21 (Playwright).

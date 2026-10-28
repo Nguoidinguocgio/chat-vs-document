@@ -61,7 +61,7 @@ flowchart LR
 
 **Cấu trúc repo [Đề xuất]**
 ```
-web/        React + TypeScript (Vite)      api/       FastAPI (Python 3.12)
+web/        Vue 3 + TypeScript (Vite)      api/       Spring Boot (Java 21, Maven)
 contracts/  openapi.yaml                   e2e/       Playwright
 eval/       bộ câu hỏi + công cụ đánh giá  ops/       docker-compose, CI, runbook
 ```
@@ -72,13 +72,15 @@ eval/       bộ câu hỏi + công cụ đánh giá  ops/       docker-compose,
 - **Định dạng lỗi duy nhất:** `{"error":{"code":"DOCUMENT_LIMIT_REACHED","message_key":"documents.limit_reached","details":{}}}`. FE chỉ tra thông điệp theo `message_key`, không hiển thị chuỗi từ máy chủ.
 - Mã lỗi dùng chung: `UNAUTHENTICATED` 401 · `SESSION_EXPIRED` 401 · `FORBIDDEN` 403 · `PASSWORD_CHANGE_REQUIRED` 403 · `NOT_FOUND` 404 · `VALIDATION_ERROR` 422. Mã riêng của từng nhóm nằm trong task tương ứng (hợp đồng đầy đủ ở [T06](T06_api-contract-and-mocks.md)).
 
-**Cấu hình (biến môi trường)**: `DATABASE_URL`, `SESSION_IDLE_HOURS=8`, `STORAGE_DIR`, `MAX_DOCS=20`, `MAX_FILE_MB=10`, `MAX_PAGES=100`, `EMBEDDING_PROVIDER`, `EMBEDDING_MODEL`, `EMBEDDING_DIM`, `LLM_PROVIDER` (`fake` cho test), `LLM_MODEL`, `LLM_API_KEY`, `RETRIEVAL_TOP_K=8`, `RETRIEVAL_MIN_SCORE=0.30`, `LLM_FIRST_TOKEN_TIMEOUT_S=30`.
+**Cấu hình (biến môi trường)**: `DB_URL` (JDBC, ví dụ `jdbc:postgresql://localhost:5432/chatdoc`), `DB_USER`, `DB_PASSWORD`, `SESSION_IDLE_HOURS=8`, `STORAGE_DIR`, `MAX_DOCS=20`, `MAX_FILE_MB=10`, `MAX_PAGES=100`, `EMBEDDING_PROVIDER` (`ollama` | `fake` cho test), `EMBEDDING_BASE_URL`, `EMBEDDING_MODEL=bge-m3`, `EMBEDDING_DIM=1024`, `LLM_PROVIDER` (`anthropic` | `fake` cho test), `LLM_MODEL=claude-sonnet-5-5`, `LLM_API_KEY`, `RETRIEVAL_TOP_K=8`, `RETRIEVAL_MIN_SCORE=0.30`, `LLM_FIRST_TOKEN_TIMEOUT_S=30`, `STREAM_STALL_SECONDS=31` (chỉ FakeLLM); frontend: `VITE_POLL_FALLBACK`.
 
-**Ngăn xếp [Đề xuất]**: Python 3.12, FastAPI, SQLAlchemy 2 + Alembic, PostgreSQL 16 + pgvector, PyMuPDF, argon2-cffi, pytest · React 18, TypeScript, Vite, TanStack Query, Zustand, Radix UI, Tailwind, `pdfjs-dist`, `react-markdown` + `rehype-sanitize`, Vitest, Testing Library, MSW, Playwright, axe-core.
+**Nhà cung cấp AI [Đã chốt 2026-10-26]:** embedding `bge-m3` (đa ngôn ngữ, 1024 chiều) chạy qua Ollama; LLM Anthropic Claude `claude-sonnet-5-5`. Lưu ý: từ 2026-10-21 Messages API trả 400 nếu gửi `temperature`/`top_p`/`top_k` — không đặt các tham số này (T13).
+
+**Ngăn xếp [Đã chốt theo môi trường PC]**: Backend — Java 21, Spring Boot 3 (Web, Security, Validation, Data JPA), Flyway, Apache PDFBox, Argon2 (Spring Security + BouncyCastle), Maven, JUnit 5 + Testcontainers · Cơ sở dữ liệu — PostgreSQL 16 + pgvector (+ citext) · Frontend — Vue 3 (Composition API), TypeScript, Vite, Vue Router, Pinia, TanStack Query (`@tanstack/vue-query`), Reka UI (Radix Vue), Tailwind, `pdfjs-dist`, `markdown-it` + DOMPurify, vue-i18n, Vitest, Vue Test Utils + Testing Library, MSW, Playwright, axe-core.
 
 **Quy tắc bảo mật xuyên suốt**
 - Không ghi nội dung câu hỏi, câu trả lời, văn bản tài liệu vào log, analytics hay công cụ giám sát lỗi.
-- Nội dung do LLM sinh và văn bản trích từ PDF là dữ liệu không tin cậy: chỉ render qua `shared/lib/markdown`, cấm `dangerouslySetInnerHTML` ở nơi khác.
+- Nội dung do LLM sinh và văn bản trích từ PDF là dữ liệu không tin cậy: chỉ render qua `shared/lib/markdown`, cấm `v-html`/`innerHTML` ở nơi khác.
 - Không lưu token trong `localStorage`; bản nháp câu hỏi chỉ ở `sessionStorage`.
 - Nhà cung cấp LLM/embedding chỉ được gọi từ backend, qua các "port" (interface) để thay đổi được.
 

@@ -19,9 +19,9 @@ Chứng minh bằng test tự động rằng **mọi luồng P0 của hai story 
 
 ### 3.1 Môi trường
 - `e2e/playwright.config.ts`: dự án `chromium` và `msedge` (channel `msedge`), viewport 1440×900 (thêm 1100×800 cho một số kịch bản), `trace: 'retain-on-failure'`, `video: 'retain-on-failure'`, thử lại 1 lần trên CI.
-- **Môi trường xác định:** `docker compose -f ops/docker-compose.e2e.yml up` chạy PostgreSQL + API (`LLM_PROVIDER=fake`, `EMBEDDING_PROVIDER=fake`, `STREAM_STALL_SECONDS=3`, `LLM_FIRST_TOKEN_TIMEOUT_S=2` để kịch bản "chậm" chạy nhanh) + web build. Mỗi test file khởi tạo dữ liệu qua API/CLI (tạo người dùng, xóa tài liệu) — không phụ thuộc thứ tự test.
+- **Môi trường xác định:** `docker compose -f ops/docker-compose.e2e.yml up` (hoặc `ops/scripts/e2e-up.ps1` khi dùng PostgreSQL cài sẵn) chạy PostgreSQL + API (Spring profile `e2e`) (`LLM_PROVIDER=fake`, `EMBEDDING_PROVIDER=fake`, `STREAM_STALL_SECONDS=3`, `LLM_FIRST_TOKEN_TIMEOUT_S=2` để kịch bản "chậm" chạy nhanh) + web build. Mỗi test file khởi tạo dữ liệu qua API/CLI (tạo người dùng, xóa tài liệu) — không phụ thuộc thứ tự test.
 - Người dùng mẫu: `lan` (Member), `minh` (Member, ngữ cảnh thứ hai), `tam` (mật khẩu tạm — để test đổi mật khẩu).
-- **Fixtures PDF** (`e2e/fixtures/`): sinh bằng mã (dùng lại `api/tests/make_fixtures.py` của T08): `ok_vi.pdf`, `ok_en.pdf`, `too_many_101p.pdf`, `encrypted.pdf`, `scanned.pdf`, `mixed_scan.pdf`, `corrupted.pdf`, `fake_docx.pdf` (đuôi pdf nhưng nội dung không phải PDF), `big_11mb.pdf`, và `injection.pdf`.
+- **Fixtures PDF** (`e2e/fixtures/`): sinh bằng mã (dùng lại `MakeFixtures.java` trong `api/src/test/java` của T08, chạy qua `./mvnw exec:java` hoặc xuất sẵn vào `e2e/fixtures/`): `ok_vi.pdf`, `ok_en.pdf`, `too_many_101p.pdf`, `encrypted.pdf`, `scanned.pdf`, `mixed_scan.pdf`, `corrupted.pdf`, `fake_docx.pdf` (đuôi pdf nhưng nội dung không phải PDF), `big_11mb.pdf`, và `injection.pdf`.
 
 ### 3.2 Kịch bản bắt buộc (ánh xạ tới kịch bản T1… của tài liệu user stories)
 | Mã | Kịch bản | Kiểm tra chính | Từ |

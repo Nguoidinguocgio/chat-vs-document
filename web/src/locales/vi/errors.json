@@ -1,0 +1,13 @@
+{
+  "generic": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+  "unauthenticated": "Vui lòng đăng nhập.",
+  "session_expired": "Phiên làm việc đã hết hạn.",
+  "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+  "password_change_required": "Bạn cần đổi mật khẩu trước khi tiếp tục.",
+  "not_found": "Không tìm thấy.",
+  "method_not_allowed": "Thao tác không được hỗ trợ.",
+  "payload_too_large": "Dữ liệu gửi lên quá lớn.",
+  "unsupported_media_type": "Định dạng dữ liệu không được hỗ trợ.",
+  "validation": "Dữ liệu chưa hợp lệ.",
+  "region_failed": "Không hiển thị được vùng này."
+}

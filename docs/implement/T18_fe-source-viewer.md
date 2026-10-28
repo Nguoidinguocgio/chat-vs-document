@@ -46,7 +46,7 @@ Bấm `[n]` → trong **≤ 1,5 giây** thấy đúng trang PDF với **đoạn 
 **EV-030** `citation_clicked {question_id, document_id, page, citation_index, viewer_load_ms}` — `viewer_load_ms` đo từ lúc bấm đến khi trang đã vẽ xong; gửi qua `shared/lib/analytics`.
 
 ## 4. Tệp sẽ tạo
-`features/source-viewer/{SourceViewerPanel.tsx, usePdfDocument.ts, PdfPage.tsx, highlight.ts, normalizeText.ts, useCitation.ts}`, `app/citationBus.ts`, mở rộng `RightPanel` (khe `source`), `*.test.ts(x)`, fixture PDF nhỏ nhiều trang.
+`features/source-viewer/{SourceViewerPanel.vue, usePdfDocument.ts, PdfPage.vue, highlight.ts, normalizeText.ts, useCitation.ts}`, `app/citationBus.ts`, mở rộng `RightPanel` (khe `source`), `*.test.ts`, fixture PDF nhỏ nhiều trang.
 
 ## 5. Tiêu chí hoàn thành
 - [ ] AC-030.1: bấm `[1]` → bảng mở, trang đúng, đoạn nổi bật xuất hiện và được cuộn vào giữa; **thời gian từ bấm đến vẽ xong ≤ 1,5 giây** trên PDF 100 trang qua mạng nội bộ (đo bằng EV-030 `viewer_load_ms` và E2E; kèm số liệu trong PR).
@@ -62,7 +62,7 @@ Bấm `[n]` → trong **≤ 1,5 giây** thấy đúng trang PDF với **đoạn 
 - [ ] EV-030 được gửi đúng một lần mỗi lần mở, không chứa nội dung.
 
 ## 6. Kiểm thử
-Vitest (thuật toán highlight, ánh xạ vị trí); Testing Library + MSW (trạng thái 410, lỗi mạng, thay đổi trích dẫn); Playwright (T21) đo thời gian mở và kiểm tra highlight trên PDF thật.
+Vitest (thuật toán highlight, ánh xạ vị trí); Vue Test Utils/Testing Library + MSW (trạng thái 410, lỗi mạng, thay đổi trích dẫn); Playwright (T21) đo thời gian mở và kiểm tra highlight trên PDF thật.
 
 ## 7. Ghi chú
 Nếu OQ-UX-01 xác nhận backend có thể trả tọa độ chữ chính xác theo pdf.js, có thể thay bước 3.5 bằng vẽ trực tiếp theo tọa độ — giữ nguyên giao diện `highlight.ts` để thay thế dễ.

@@ -70,7 +70,7 @@ data: {"answer_type":"answered"}
 **EV-020** `chat_question_submitted` `{conversation_id, turn_index, question_length, question_lang, ready_document_count}` — ngay khi nhận hợp lệ. **EV-023** `chat_answer_completed` `{question_id, total_ms, answer_type, citation_count, distinct_document_count, llm_input_tokens, llm_output_tokens}` khi `done`. **EV-024** `chat_answer_failed` `{question_id, error_code}` khi lỗi. Không ghi nội dung.
 
 ## 4. Tệp sẽ tạo
-`routers/chat.py`, `services/conversations.py`, `services/chat_stream.py`, `tests/test_chat_*.py`.
+`web/ChatController.java` (trả `SseEmitter`, chạy trên virtual thread), `service/ConversationService.java`, `service/ChatStreamService.java`, `ChatControllerIT.java`.
 
 ## 5. Tiêu chí hoàn thành
 Dùng `FakeLLM`/`FakeEmbedding`:
@@ -89,7 +89,13 @@ Dùng `FakeLLM`/`FakeEmbedding`:
 - [ ] Người chưa đăng nhập → `401`; thiếu `X-Requested-With` → `403`.
 
 ## 6. Kiểm thử
-pytest với client SSE (httpx stream) + `FakeLLM`; đồng hồ giả cho hạn 30 giây; test đồng thời hai yêu cầu; test hủy bằng cách đóng kết nối.
+JUnit 5 với client SSE (`java.net.http.HttpClient` đọc luồng / `WebTestClient`) + `FakeLLM`; `java.time.Clock` giả cho hạn 30 giây; test đồng thời hai yêu cầu; test hủy bằng cách đóng kết nối.
 
 ## 7. Ghi chú
 Nếu OQ-UX-02 xác nhận proxy đệm SSE, thử gửi `delta` theo mảnh nhỏ cùng `: ping` thường xuyên hơn; không đổi giao thức.
+
+**Ghi chú khi hiện thực (2026-10-28):**
+- `POST /api/conversations/{id}/messages` trả `SseEmitter` (luồng ảo); lỗi trước luồng (422/409/404) là JSON chuẩn. `: ping` mỗi `app.chat.ping-seconds` (10 s).
+- Giới hạn đồng thời: `CHAT_MAX_CONCURRENT` (20) toàn hệ thống, chờ tối đa 10 s rồi `error rate_limited`; mỗi người ≤ 3 luồng; một luồng/hội thoại (`409 ANSWER_IN_PROGRESS`).
+- Truy hồi rỗng → `done not_found` ngay, không gọi LLM. Văn bản lưu dần mỗi 1 s; client ngắt → `stopped` (giữ phần đã có); khởi động lại → tin nhắn `streaming` mồ côi thành `failed/llm_error`.
+- `ContractTest` kiểm cả các sự kiện SSE theo `x-sse-events`. Kiểm thử: `ChatControllerIT` (11 ca, FakeLlm + FakeEmbedding).

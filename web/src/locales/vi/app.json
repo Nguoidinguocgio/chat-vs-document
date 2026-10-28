@@ -1,0 +1,23 @@
+{
+  "name": "Chat với tài liệu",
+  "open_navigation": "Mở thanh bên",
+  "close_navigation": "Đóng thanh bên",
+  "open_sources": "Mở bảng Xem nguồn",
+  "account_menu": "Tài khoản {name}",
+  "change_password": "Đổi mật khẩu",
+  "help": "Hướng dẫn sử dụng",
+  "admin": "Quản trị",
+  "reports": "Báo cáo",
+  "logout": "Đăng xuất",
+  "new_version": "Có phiên bản mới.",
+  "reload": "Tải lại",
+  "to_chat": "Về trang chat",
+  "reload_page": "Tải lại trang",
+  "error_code": "MÃ LỖI {code}",
+  "e403_title": "Bạn không có quyền truy cập trang này",
+  "e403_message": "Chức năng này chỉ dành cho Admin hoặc Trưởng nhóm. Nếu bạn cần quyền truy cập, hãy liên hệ Admin.",
+  "e404_title": "Không tìm thấy trang hoặc hội thoại",
+  "e404_message": "Đường dẫn có thể đã sai, hoặc hội thoại đã bị xóa (hội thoại tự xóa sau 90 ngày không hoạt động).",
+  "e500_title": "Đã có lỗi xảy ra",
+  "e500_message": "Vui lòng thử lại. Nếu lỗi vẫn tiếp diễn, hãy báo cho Admin kèm thời điểm xảy ra lỗi."
+}

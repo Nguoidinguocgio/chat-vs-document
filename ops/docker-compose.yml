@@ -1,0 +1,19 @@
+# PostgreSQL 16 + pgvector cho máy dev (cách a trong README). Đọc DB_USER/DB_PASSWORD từ ../.env nếu có.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: chatdoc
+      POSTGRES_USER: ${DB_USER:-chatdoc}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d chatdoc"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  dbdata:
