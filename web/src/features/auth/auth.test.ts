@@ -171,6 +171,43 @@ describe('AC-001.5: hết phiên khi đang soạn câu hỏi', () => {
     const box = (await screen.findByLabelText('Câu hỏi')) as HTMLTextAreaElement
     await waitFor(() => expect(box.value).toBe('Thời hạn thanh toán là bao lâu?'))
   })
+
+  // BUG-001 (TC-AUTH-05): phiên hết hạn đúng lúc bấm Gửi — câu hỏi không được mất.
+  it('bấm Gửi khi phiên đã hết hạn → đăng nhập lại vẫn còn câu hỏi', async () => {
+    resetMockState('lan@congty.vn')
+    const { router } = await renderApp('/c')
+    const user = userEvent.setup()
+    const box = (await screen.findByLabelText('Câu hỏi')) as HTMLTextAreaElement
+    await user.type(box, 'Điều khoản thanh toán là gì?')
+    const send = screen.getByTestId('send') as HTMLButtonElement
+    await waitFor(() => expect(send.disabled).toBe(false))
+
+    const expired = () => HttpResponse.json({ error: { code: 'SESSION_EXPIRED', message_key: 'errors.session_expired', details: {} } }, { status: 401 })
+    server.use(http.post('*/api/conversations', expired), http.post('*/api/conversations/:id/messages', expired))
+    resetMockState(null) // phiên phía máy chủ đã mất: /api/me cũng 401
+    await user.click(send)
+    await waitFor(() => expect(router.currentRoute.value.name).toBe('login'))
+    expect(router.currentRoute.value.query).toMatchObject({ reason: 'expired' })
+    expect(Object.values(sessionStorage)).toContain('Điều khoản thanh toán là gì?')
+
+    server.resetHandlers()
+    await login('lan@congty.vn')
+    await waitFor(() => expect(router.currentRoute.value.path).toBe('/c'))
+    const again = (await screen.findByLabelText('Câu hỏi')) as HTMLTextAreaElement
+    await waitFor(() => expect(again.value).toBe('Điều khoản thanh toán là gì?'))
+  })
+
+  it('gửi thành công → không còn bản nháp của câu hỏi đã gửi', async () => {
+    resetMockState('lan@congty.vn')
+    await renderApp('/c')
+    const user = userEvent.setup()
+    await user.type(await screen.findByLabelText('Câu hỏi'), 'Điều khoản thanh toán là gì?')
+    const send = screen.getByTestId('send') as HTMLButtonElement
+    await waitFor(() => expect(send.disabled).toBe(false))
+    await user.click(send)
+    await waitFor(() => expect(screen.getAllByTestId('answer-card').at(-1)?.getAttribute('data-state')).toBe('answered'), { timeout: 10_000 })
+    expect(Object.keys(sessionStorage).filter((k) => k.startsWith('draft:'))).toEqual([])
+  })
 })
 
 describe('đăng xuất', () => {

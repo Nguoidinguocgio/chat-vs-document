@@ -3,13 +3,14 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCurrentUser } from '@/features/auth'
 import { requestFilePicker, useDocuments, useDocumentsSummary } from '@/features/documents'
-import { clearDraft, flushDrafts, loadDraft, saveDraft } from '@/shared/lib/draft'
+import { flushDrafts, holdDraft, loadDraft, releaseDraft, saveDraft } from '@/shared/lib/draft'
 import Disclaimer from './Disclaimer.vue'
 import { COUNTER_FROM, MAX_QUESTION, useComposerState } from './useComposerState'
 
 // CMP-07: Enter gửi, Shift+Enter xuống dòng, bỏ qua Enter khi đang soạn dấu bằng bộ gõ (IME).
 const props = defineProps<{ draftKey: string; busy: boolean; notice?: string | null }>()
-const emit = defineEmits<{ submit: [question: string]; stop: []; openDocuments: [] }>()
+// `release`: gọi khi câu hỏi đã được máy chủ xử lý để xóa bản nháp đang giữ (AC-001.5).
+const emit = defineEmits<{ submit: [question: string, release: () => void]; stop: []; openDocuments: [] }>()
 const text = defineModel<string>({ default: '' })
 const { t } = useI18n()
 const { data: me } = useCurrentUser()
@@ -50,9 +51,14 @@ function autosize() {
 function send() {
   if (!state.value.canSend) return
   const q = text.value
+  const userId = me.value?.id
+  const key = props.draftKey
+  // Giữ câu hỏi làm nháp tới khi máy chủ nhận: phiên hết hạn đúng lúc Gửi thì không mất câu hỏi.
+  if (userId) holdDraft(userId, key, q)
   text.value = ''
-  if (me.value) clearDraft(me.value.id, props.draftKey)
-  emit('submit', q)
+  emit('submit', q, () => {
+    if (userId) releaseDraft(userId, key)
+  })
 }
 
 function onKeydown(e: KeyboardEvent) {

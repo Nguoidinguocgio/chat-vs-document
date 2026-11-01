@@ -1,0 +1,43 @@
+{
+  "test_case": "TC-A11Y-01",
+  "status": "failed",
+  "mode": "mock",
+  "browser": "chromium 156.0.8078.4 (chromium)",
+  "axe_totals": {
+    "critical": 0,
+    "serious": 16,
+    "moderate": 8,
+    "minor": 0
+  },
+  "steps": [
+    {
+      "n": 1,
+      "status": "failed",
+      "screenshot": "screenshots/01-axe-auth-empty.png",
+      "note": "vi phạm serious/critical | expect(received).toEqual(expected) // deep equality | - Expected  - 1"
+    },
+    {
+      "n": 2,
+      "status": "failed",
+      "screenshot": "screenshots/02-axe-upload.png",
+      "note": "expect(locator).toBeVisible() failed | Locator: getByText('Chưa có tài liệu nào dùng được') | Expected: visible"
+    },
+    {
+      "n": 3,
+      "status": "failed",
+      "screenshot": "screenshots/03-axe-chat.png",
+      "note": "vi phạm serious/critical | expect(received).toEqual(expected) // deep equality | - Expected  - 1"
+    },
+    {
+      "n": 4,
+      "status": "blocked",
+      "screenshot": "screenshots/04-axe-dialogs.png",
+      "note": "BỊ CHẶN một phần: Bấm chip [1] không mở bảng Xem nguồn — T18 (features/source-viewer) chưa implement. Các trạng thái còn lại của bước 4 (hộp thoại, 404, 403) đạt 0 serious/critical: Hộp thoại (Dialog, /dev/ui): critical 0, serious 0, moderate 0, minor 0 | Trang 404: critical 0, serious 0, moderate 0, minor 0 | Trang 403: critical 0, serious 0, moderate 0, minor 0"
+    }
+  ],
+  "video": "video/TC-A11Y-01.webm",
+  "defects": [],
+  "run_at": "2026-11-01T15:11:17.150Z",
+  "runner": "Claude Code (Playwright tự động)",
+  "commit": "e508690 (+ thay đổi chưa commit)"
+}

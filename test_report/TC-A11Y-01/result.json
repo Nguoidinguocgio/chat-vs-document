@@ -1,0 +1,52 @@
+{
+  "test_case": "TC-A11Y-01",
+  "round": 2,
+  "status": "blocked",
+  "mode": "mock",
+  "browser": "chromium 156.0.8078.4 (chromium)",
+  "axe_totals": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 9,
+    "minor": 0
+  },
+  "steps": [
+    {
+      "n": 1,
+      "status": "passed",
+      "screenshot": "screenshots/01-axe-auth-empty.png",
+      "note": "Đăng nhập: critical 0, serious 0, moderate 0, minor 0 | Đổi mật khẩu (bắt buộc): critical 0, serious 0, moderate 0, minor 0 | Workspace trống: critical 0, serious 0, moderate 1, minor 0"
+    },
+    {
+      "n": 2,
+      "status": "passed",
+      "screenshot": "screenshots/02-axe-upload.png",
+      "note": "Đang tải lên / Đang xử lý: critical 0, serious 0, moderate 1, minor 0 | Danh sách có lỗi (all_failed): critical 0, serious 0, moderate 1, minor 0"
+    },
+    {
+      "n": 3,
+      "status": "passed",
+      "screenshot": "screenshots/03-axe-chat.png",
+      "note": "Đang tạo câu trả lời: critical 0, serious 0, moderate 1, minor 0 | Có trích dẫn: critical 0, serious 0, moderate 1, minor 0 | Không tìm thấy: critical 0, serious 0, moderate 1, minor 0 | Một phần: critical 0, serious 0, moderate 1, minor 0 | Lỗi dịch vụ AI: critical 0, serious 0, moderate 1, minor 0 | Gián đoạn: critical 0, serious 0, moderate 1, minor 0"
+    },
+    {
+      "n": 4,
+      "status": "blocked",
+      "screenshot": "screenshots/04-axe-dialogs.png",
+      "note": "BỊ CHẶN một phần: Bấm chip [1] không mở bảng Xem nguồn — T18 (features/source-viewer) chưa implement. Các trạng thái còn lại của bước 4 (hộp thoại, 404, 403) đạt 0 serious/critical: Hộp thoại (Dialog, /dev/ui): critical 0, serious 0, moderate 0, minor 0 | Trang 404: critical 0, serious 0, moderate 0, minor 0 | Trang 403: critical 0, serious 0, moderate 0, minor 0"
+    }
+  ],
+  "video": "video/TC-A11Y-01.webm",
+  "defects": [
+    "BUG-003",
+    "BUG-004"
+  ],
+  "run_at": "2026-11-01T15:35:38.399Z",
+  "runner": "Claude Code (Playwright tự động)",
+  "commit": "e508690 (+ thay đổi chưa commit)",
+  "verified_fixes": [
+    "BUG-002"
+  ],
+  "previous_round": "round-1/result.json",
+  "report_dir": "round-2"
+}

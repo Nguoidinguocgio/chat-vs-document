@@ -31,9 +31,12 @@ function select(key: string) {
   <Menu :items="items" @select="select">
     <template #trigger>
       <Button variant="ghost" size="sm" :aria-label="t('app.account_menu', { name: user.display_name })">
-        <span aria-hidden="true" class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary-bg text-xs font-semibold text-primary">
-          {{ user.display_name.slice(0, 1).toUpperCase() }}
-        </span>
+        <!-- Chữ cái đầu vẽ bằng ::before (không phải text node) để tên trợ năng chứa đủ chữ hiển thị (WCAG 2.5.3) -->
+        <span
+          aria-hidden="true"
+          :data-initial="user.display_name.slice(0, 1).toUpperCase()"
+          class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary-bg text-xs font-semibold text-primary before:content-[attr(data-initial)]"
+        />
         <span class="max-w-[140px] truncate text-text">{{ user.display_name }}</span>
       </Button>
     </template>

@@ -30,7 +30,7 @@ defineExpose({ focus: () => composer.value?.focus() })
       :draft-key="draftKey"
       :busy="busy"
       :notice="notice"
-      @submit="chat.ask($event, props.hooks)"
+      @submit="(q, release) => chat.ask(q, { ...props.hooks, onHandled: release })"
       @stop="chat.abort('stop')"
       @open-documents="emit('openDocuments')"
     />

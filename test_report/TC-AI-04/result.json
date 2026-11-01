@@ -1,0 +1,95 @@
+{
+  "test_case": "TC-AI-04",
+  "status": "blocked",
+  "mode": "ai",
+  "browser": "chromium (chromium) — trang hiển thị đầu ra lệnh",
+  "th07": null,
+  "config": {
+    "prompt_version": "không xác định (chưa chạy)",
+    "RETRIEVAL_TOP_K": "8",
+    "RETRIEVAL_MIN_SCORE": "0.30",
+    "LLM_MODEL": "claude-sonnet-5-5",
+    "EMBEDDING_MODEL": "bge-m3",
+    "runs": 0
+  },
+  "blockers": [
+    "Thiếu bộ đánh giá DEP-002 (T20 chưa làm): eval, eval/run.py, eval/score.py, eval/dep002.yaml, eval/corpus",
+    "Docker Engine không chạy → không có PostgreSQL cho backend thật",
+    "Backend thật (localhost:8080) không chạy",
+    "Ollama + bge-m3 không sẵn sàng tại localhost:11434",
+    ".env đang LLM_PROVIDER=fake (cần anthropic + khóa kiểm thử)"
+  ],
+  "commands": [
+    {
+      "cmd": "[kiểm tra tồn tại] eval/, eval/run.py, eval/score.py, eval/dep002.yaml, eval/corpus",
+      "ok": false,
+      "out": "eval: False\neval/run.py: False\neval/score.py: False\neval/dep002.yaml: False\neval/corpus: False"
+    },
+    {
+      "cmd": "$ docker info --format {{.ServerVersion}}",
+      "ok": false,
+      "out": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified."
+    },
+    {
+      "cmd": "[HTTP GET] http://localhost:8080/healthz",
+      "ok": false,
+      "out": "LỖI: ECONNREFUSED"
+    },
+    {
+      "cmd": "[HTTP GET] http://localhost:11434/api/tags",
+      "ok": false,
+      "out": "LỖI: ECONNREFUSED"
+    },
+    {
+      "cmd": "[đọc .env] EMBEDDING_PROVIDER, LLM_PROVIDER, LLM_API_KEY (giá trị khóa được che)",
+      "ok": false,
+      "out": "EMBEDDING_PROVIDER=ollama\nLLM_PROVIDER=fake\nLLM_API_KEY=<trống>"
+    },
+    {
+      "cmd": "$ python eval/run.py --base-url http://localhost:8080 --user lan@congty.vn --password Matkhau-2026",
+      "ok": false,
+      "out": "python: can't open file 'D:\\\\Learning\\\\AI SDLC\\\\sdlc_project\\\\chat-vs-document\\\\eval\\\\run.py': [Errno 2] No such file or directory\n(exit 2)"
+    },
+    {
+      "cmd": "[kiểm tra tồn tại] grading.csv, eval/grading.csv",
+      "ok": false,
+      "out": "false"
+    },
+    {
+      "cmd": "$ python eval/score.py grading.csv",
+      "ok": false,
+      "out": "python: can't open file 'D:\\\\Learning\\\\AI SDLC\\\\sdlc_project\\\\chat-vs-document\\\\eval\\\\score.py': [Errno 2] No such file or directory\n(exit 2)"
+    }
+  ],
+  "steps": [
+    {
+      "n": 1,
+      "status": "blocked",
+      "screenshot": "screenshots/01-run-all.png",
+      "note": "BỊ CHẶN: Thiếu bộ đánh giá DEP-002 (T20 chưa làm): eval, eval/run.py, eval/score.py, eval/dep002.yaml, eval/corpus; Docker Engine không chạy → không có PostgreSQL cho backend thật; Backend thật (localhost:8080) không chạy; Ollama + bge-m3 không sẵn sàng tại localhost:11434; .env đang LLM_PROVIDER=fake (cần anthropic + khóa kiểm thử). Lệnh eval/run.py không chạy được (xem ảnh)."
+    },
+    {
+      "n": 2,
+      "status": "blocked",
+      "screenshot": "screenshots/02-grading-done.png",
+      "note": "BỊ CHẶN: không có grading.csv (bước 1 bị chặn); bộ câu hỏi DEP-002 chưa có / chưa được Đội PTKD ký (G-03); chưa có chuyên gia chấm."
+    },
+    {
+      "n": 3,
+      "status": "blocked",
+      "screenshot": "screenshots/03-th07-result.png",
+      "note": "BỊ CHẶN: eval/score.py và grading.csv không tồn tại → không tính được tỷ lệ TH-07."
+    },
+    {
+      "n": 4,
+      "status": "blocked",
+      "screenshot": "screenshots/04-fabrication-analysis.png",
+      "note": "BỊ CHẶN: không có câu được chấm \"bịa\" để phân tích (phụ thuộc bước 1–3)."
+    }
+  ],
+  "video": "video/TC-AI-04.webm",
+  "defects": [],
+  "run_at": "2026-11-01T15:17:19.843Z",
+  "runner": "Claude Code (Playwright tự động)",
+  "commit": "e508690 (+ thay đổi chưa commit)"
+}

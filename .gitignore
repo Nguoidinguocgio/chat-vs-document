@@ -9,3 +9,10 @@ target/
 .vscode/
 # File người dùng tải lên khi chạy cục bộ (STORAGE_DIR)
 storage/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

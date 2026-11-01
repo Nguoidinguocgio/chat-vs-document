@@ -74,7 +74,7 @@ Kịch bản API giả `?mock=`: `answered` (mặc định), `not_found`, `parti
 | [TC-AUTH-02](TC-AUTH-02.md) | Đăng nhập sai mật khẩu hoặc sai email | P0 | Giao diện | API giả | AC-001.2 · NFR-S03 · E-01 | Chưa chạy |
 | [TC-AUTH-03](TC-AUTH-03.md) | Tài khoản bị khóa tạm sau nhiều lần sai | P0 | Giao diện | API giả | AC-001.3 · NFR-S03 · E-01 | Chưa chạy |
 | [TC-AUTH-04](TC-AUTH-04.md) | Mật khẩu tạm bắt buộc đổi trước khi vào chat | P0 | Giao diện | API giả | AC-001.4 · E-01 | Chưa chạy |
-| [TC-AUTH-05](TC-AUTH-05.md) | Hết phiên khi đang soạn: giữ nguyên nội dung nháp | P0 | Giao diện | API giả | AC-001.5 · PRD §5.2 · E-02 | Chưa chạy |
+| [TC-AUTH-05](TC-AUTH-05.md) | Hết phiên khi đang soạn: giữ nguyên nội dung nháp | P0 | Giao diện | API giả | AC-001.5 · PRD §5.2 · E-02 | [Đạt](../../../test_report/TC-AUTH-05/report.md) (round 2; BUG-001 đã sửa) |
 | [TC-AUTH-06](TC-AUTH-06.md) | Chưa đăng nhập: không truy cập được trang chat và API | P0 | Giao diện | Backend thật + Fake | AC-001.6 · NFR-S04 · E-03 | Chưa chạy |
 | [TC-AUTH-07](TC-AUTH-07.md) | Vô hiệu hóa người dùng khi đang dùng: về đăng nhập ≤ 60 s | P0 | Giao diện | Backend thật + Fake | AC-003.1 · E-21 | Chưa chạy |
 | **BB-01 Tải lên PDF** | | | | | | |
@@ -94,9 +94,9 @@ Kịch bản API giả `?mock=`: `answered` (mặc định), `not_found`, `parti
 | **BB-02 Hỏi đáp có trích nguồn** | | | | | | |
 | [TC-CHAT-01](TC-CHAT-01.md) | Hỏi đáp: câu trả lời hiển thị dần kèm trích dẫn | P0 | Giao diện | API giả | AC-020.1 · AC-020.3 · AC-022.1 · TH-01/02 | Chưa chạy |
 | [TC-CHAT-02](TC-CHAT-02.md) | Hỏi đáp đa tài liệu: trích dẫn tới cả hai tài liệu | P0 | Giao diện | API giả | AC-021.1 · AC-021.2 · AC-022.1 | Chưa chạy |
-| [TC-CHAT-03](TC-CHAT-03.md) | Hai tài liệu mâu thuẫn: nêu cả hai, không tự chọn bên | P0 | Giao diện | API giả | AC-021.3 | Chưa chạy |
+| [TC-CHAT-03](TC-CHAT-03.md) | Hai tài liệu mâu thuẫn: nêu cả hai, không tự chọn bên | P0 | Giao diện | API giả | AC-021.3 | [Đạt](../../../test_report/TC-CHAT-03/report.md) (mock) |
 | [TC-CHAT-04](TC-CHAT-04.md) | Ngoài phạm vi tài liệu: "Không tìm thấy", không có nguồn | P0 | Giao diện | API giả | AC-023.1 · AC-023.2 · TH-06 | Chưa chạy |
-| [TC-CHAT-05](TC-CHAT-05.md) | Trả lời một phần: nêu phần tìm thấy và phần không tìm thấy | P0 | Giao diện | API giả | AC-023.3 | Chưa chạy |
+| [TC-CHAT-05](TC-CHAT-05.md) | Trả lời một phần: nêu phần tìm thấy và phần không tìm thấy | P0 | Giao diện | API giả | AC-023.3 | [Đạt](../../../test_report/TC-CHAT-05/report.md) (mock) |
 | [TC-CHAT-06](TC-CHAT-06.md) | Hỏi bằng tiếng Việt trên tài liệu tiếng Anh | P0 | Giao diện | LLM thật | AC-024.1 · AC-024.2 · D-005 | Chưa chạy |
 | [TC-CHAT-07](TC-CHAT-07.md) | Injection từ nội dung PDF và câu trả lời: render an toàn | P0 | Giao diện | Backend thật + Fake | NFR-S05 · R-4 · DD-06 | Chưa chạy |
 | [TC-CHAT-08](TC-CHAT-08.md) | Ô nhập: giới hạn 2.000 ký tự, rỗng, Enter / Shift+Enter, bộ gõ tiếng Việt | P0 | Giao diện | API giả | ST-04 · AC-020.3 · PRD §5.2 | Chưa chạy |
@@ -132,7 +132,7 @@ Kịch bản API giả `?mock=`: `answered` (mặc định), `not_found`, `parti
 | [TC-PERF-04](TC-PERF-04.md) | L-4: Tải trang ban đầu — LCP p75 ≤ 2 s, JS khởi tạo ≤ 200 KB gzip | P1 | Công cụ | Backend thật + Fake | TH-08 · NFR-P04 | Chưa chạy |
 | [TC-PERF-05](TC-PERF-05.md) | L-5: Độ bền 2 giờ dưới tải trung bình | P1 | Công cụ | LLM thật | NFR-A01 · G-05 | Chưa chạy |
 | **Khả năng tiếp cận** | | | | | | |
-| [TC-A11Y-01](TC-A11Y-01.md) | axe-core: 0 lỗi serious / critical ở mọi trạng thái chính | P0 | Giao diện | API giả | NFR-U03 · WCAG 2.1 AA | Chưa chạy |
+| [TC-A11Y-01](TC-A11Y-01.md) | axe-core: 0 lỗi serious / critical ở mọi trạng thái chính | P0 | Giao diện | API giả | NFR-U03 · WCAG 2.1 AA | [Bị chặn một phần](../../../test_report/TC-A11Y-01/report.md) (round 2: 0 serious; BUG-002 đã sửa; Xem nguồn chờ T18; BUG-003/004 còn mở) |
 | [TC-A11Y-02](TC-A11Y-02.md) | Chỉ dùng bàn phím: đăng nhập → tải → hỏi → xem nguồn → đóng | P0 | Giao diện | API giả | NFR-U03 | Chưa chạy |
 | [TC-A11Y-03](TC-A11Y-03.md) | Tương phản màu và thu phóng 200% | P0 | Giao diện | API giả | NFR-U03 · WCAG 2.1 AA | Chưa chạy |
 | [TC-A11Y-04](TC-A11Y-04.md) | `prefers-reduced-motion`: không có hoạt ảnh | P1 | Giao diện | API giả | NFR-U03 | Chưa chạy |
@@ -141,7 +141,7 @@ Kịch bản API giả `?mock=`: `answered` (mặc định), `not_found`, `parti
 | [TC-AI-01](TC-AI-01.md) | TH-04: Trích dẫn trỏ đúng trang ≥ 90% | P0 | Công cụ | LLM thật | TH-04 · AC-022.3 · G-04 | Chưa chạy |
 | [TC-AI-02](TC-AI-02.md) | TH-05: Câu trả lời đa tài liệu "đầy đủ" ≥ 80% | P0 | Công cụ | LLM thật | TH-05 · AC-021.1 · G-04 | Chưa chạy |
 | [TC-AI-03](TC-AI-03.md) | TH-06: Câu hỏi ngoài phạm vi nhận "không tìm thấy" ≥ 90% | P0 | Công cụ | LLM thật | TH-06 · AC-023.1 · AC-023.2 · G-04 | Chưa chạy |
-| [TC-AI-04](TC-AI-04.md) | TH-07: Câu trả lời bịa đặt ≤ 5% | P0 | Công cụ | LLM thật | TH-07 · AC-022.3 · RSK-001 · G-04 | Chưa chạy |
+| [TC-AI-04](TC-AI-04.md) | TH-07: Câu trả lời bịa đặt ≤ 5% | P0 | Công cụ | LLM thật | TH-07 · AC-022.3 · RSK-001 · G-04 | [Bị chặn](../../../test_report/TC-AI-04/report.md) (thiếu T20 / môi trường `ai`) |
 | [TC-AI-05](TC-AI-05.md) | Nhóm injection: không vi phạm, không lộ prompt hệ thống | P0 | Công cụ | LLM thật | NFR-S05 · G-04 | Chưa chạy |
 | [TC-AI-06](TC-AI-06.md) | Hỏi chéo ngôn ngữ: chênh lệch ≤ 10 điểm % so với cùng ngôn ngữ | P0 | Công cụ | LLM thật | AC-024.1 · AC-024.2 · G-04 | Chưa chạy |
 | [TC-AI-07](TC-AI-07.md) | Mọi câu hỏi kết thúc hợp lệ và mọi câu trả lời có trích dẫn | P0 | Công cụ | LLM thật | AC-020.2 · AC-022.2 · G-04 | Chưa chạy |

@@ -18,7 +18,14 @@ export interface AskHooks {
   onNoDocuments?: () => void
   /** Lượt hỏi đáp kết thúc (làm mới danh sách hội thoại, focus ô nhập). */
   onSettled?: () => void
+  /**
+   * Máy chủ đã nhận câu hỏi (luồng mở) hoặc từ chối không vì phiên → ô nhập xóa bản nháp đang giữ.
+   * Không gọi khi hết phiên / chưa đăng nhập: bản nháp được giữ để khôi phục sau khi đăng nhập lại (AC-001.5).
+   */
+  onHandled?: () => void
 }
+
+const SESSION_CODES = new Set(['SESSION_EXPIRED', 'UNAUTHENTICATED'])
 
 type Frame = (cb: () => void) => void
 const nextFrame: Frame = (cb) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => cb()) : setTimeout(cb, 16))
@@ -119,6 +126,7 @@ export const useAnswerStream = defineStore('answer-stream', () => {
         hooks.onCreated?.(id)
       }
       const body = await openStream(`/api/conversations/${id}/messages`, { question }, ctl.signal)
+      hooks.onHandled?.()
       for await (const ev of parseSseStream(body, { onActivity: resetWatchdog, signal: ctl.signal })) {
         const d = ev.data as Record<string, unknown>
         if (ev.event === 'delta') {
@@ -144,6 +152,7 @@ export const useAnswerStream = defineStore('answer-stream', () => {
       patch(key, { type: 'closed' })
     } catch (e) {
       flush()
+      if (!(isApiError(e) && SESSION_CODES.has(e.code))) hooks.onHandled?.()
       if (e instanceof DOMException && e.name === 'AbortError') {
         if (abortReason === 'timeout') patch(key, { type: 'timeout' })
         else if (abortReason === 'stop') patch(key, { type: 'stopped' })

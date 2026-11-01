@@ -1,0 +1,43 @@
+{
+  "test_case": "TC-CHAT-05",
+  "status": "passed",
+  "mode": "mock",
+  "browser": "chromium 156.0.8078.4 (chromium)",
+  "steps": [
+    {
+      "n": 1,
+      "status": "passed",
+      "screenshot": "screenshots/01-ready.png",
+      "note": "Đăng nhập lan@congty.vn (?mock=partial) → http://localhost:5173/c?mock=partial; ô nhập mở khóa"
+    },
+    {
+      "n": 2,
+      "status": "passed",
+      "screenshot": "screenshots/02-ask.png",
+      "note": "Câu trả lời hiển thị, data-state=partial"
+    },
+    {
+      "n": 3,
+      "status": "passed",
+      "screenshot": "screenshots/03-found-part.png",
+      "note": "\"Doanh thu quý 3 đạt 128,4 tỷ đồng, tăng 12% so với cùng kỳ 1.\" — có chip [1] (BaoCao_Q3_2026_ban_cuoi_cung_da_duyet_v3.pdf, trang 7)"
+    },
+    {
+      "n": 4,
+      "status": "passed",
+      "screenshot": "screenshots/04-missing-part.png",
+      "note": "Khối \"không tìm thấy\": \"Không tìm thấy: Biên lợi nhuận theo từng mảng không có trong các tài liệu hiện có.\" — khớp nguyên văn"
+    },
+    {
+      "n": 5,
+      "status": "passed",
+      "screenshot": "screenshots/05-sources.png",
+      "note": "Danh sách Nguồn chỉ có 1 mục: \"[1] BaoCao_Q3_2026_ban_cuoi_cung_da_duyet_v3.pdf, trang 7\"; không có nguồn cho phần không tìm thấy"
+    }
+  ],
+  "video": "video/TC-CHAT-05.webm",
+  "defects": [],
+  "run_at": "2026-11-01T15:14:10.193Z",
+  "runner": "Claude Code (Playwright tự động)",
+  "commit": "e508690 (+ thay đổi chưa commit)"
+}

@@ -15,7 +15,7 @@
   "first_ready_toast": "Đã sẵn sàng. Hãy đặt câu hỏi.",
   "list_label": "Danh sách tài liệu",
   "count": "{n}/20",
-  "count_label": "Tài liệu: {n} trên 20",
+  "count_label": "{n}/20 tài liệu",
   "close_panel": "Đóng bảng",
   "empty_list": "Chưa có tài liệu nào trong workspace.",
   "drop_here": "Kéo-thả PDF vào đây",

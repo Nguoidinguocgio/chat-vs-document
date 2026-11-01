@@ -4,7 +4,7 @@ import { resetMockState } from '@/mocks'
 import { server } from '@/mocks/server'
 import { ApiError, request, setGlobalErrorHandler } from '@/shared/api'
 import { clearQueue, flush, pendingCount, track } from '@/shared/lib/analytics'
-import { clearAllDrafts, DRAFT_DEBOUNCE_MS, flushDrafts, loadDraft, saveDraft } from '@/shared/lib/draft'
+import { clearAllDrafts, DRAFT_DEBOUNCE_MS, flushDrafts, holdDraft, loadDraft, releaseDraft, saveDraft } from '@/shared/lib/draft'
 import { formatBytes, formatDateTime, midEllipsis } from '@/shared/lib/format'
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
@@ -79,6 +79,23 @@ describe('shared/lib/draft', () => {
     clearAllDrafts()
     expect(sessionStorage.getItem('draft:u1:c2')).toBeNull()
     expect(sessionStorage.getItem('khac')).toBe('1')
+  })
+  it('holdDraft giữ câu hỏi đã Gửi dù ô nhập bị xóa; releaseDraft mới xóa (BUG-001)', () => {
+    holdDraft('u1', 'c4', 'câu hỏi')
+    expect(sessionStorage.getItem('draft:u1:c4')).toBe('câu hỏi')
+    saveDraft('u1', 'c4', '') // ô nhập trống sau khi Gửi
+    flushDrafts()
+    expect(sessionStorage.getItem('draft:u1:c4')).toBe('câu hỏi')
+    releaseDraft('u1', 'c4')
+    expect(sessionStorage.getItem('draft:u1:c4')).toBeNull()
+  })
+  it('gõ nháp mới sau khi Gửi thì releaseDraft không xóa nháp mới', () => {
+    holdDraft('u1', 'c5', 'cũ')
+    saveDraft('u1', 'c5', 'mới')
+    flushDrafts()
+    releaseDraft('u1', 'c5')
+    expect(sessionStorage.getItem('draft:u1:c5')).toBe('mới')
+    clearAllDrafts()
   })
   it('không bao giờ dùng localStorage', () => {
     saveDraft('u1', 'c3', 'x')

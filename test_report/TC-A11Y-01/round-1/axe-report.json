@@ -1,0 +1,462 @@
+{
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice"
+  ],
+  "states": [
+    {
+      "state": "Đăng nhập",
+      "url": "http://localhost:5173/login?next=/c?mock=empty_workspace",
+      "violations": [],
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Đổi mật khẩu (bắt buộc)",
+      "url": "http://localhost:5173/change-password?mode=required",
+      "violations": [],
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Workspace trống",
+      "url": "http://localhost:5173/c?mock=empty_workspace",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Đang tải lên / Đang xử lý",
+      "url": "http://localhost:5173/c?mock=empty_workspace",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Danh sách có lỗi (all_failed)",
+      "url": "http://localhost:5173/c?mock=all_failed",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Đang tạo câu trả lời",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Có trích dẫn",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Không tìm thấy",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Một phần",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Lỗi dịch vụ AI",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Gián đoạn",
+      "url": "http://localhost:5173/c/ffffffff-0000-4000-8000-000000000001",
+      "violations": [
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "help": "Elements must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".min-h-\\[32px\\]"
+              ],
+              "html": "<button data-v-1be74e3f=\"\" type=\"button\" data-testid=\"doc-counter\" class=\"touch-target inline-flex min-h-[32px] items-center gap-1 rounded-md border px-2 text-sm border-border text-text hover:bg-bg-su"
+            },
+            {
+              "target": [
+                "#reka-dropdown-menu-trigger-v-2"
+              ],
+              "html": "<button type=\"button\" class=\"touch-target inline-...\" id=\"reka-dropdown-menu-t...\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\" aria-label=\"Tài khoản Lan\">"
+            }
+          ]
+        },
+        {
+          "id": "page-has-heading-one",
+          "impact": "moderate",
+          "help": "Page should contain a level-one heading",
+          "nodes": [
+            {
+              "target": [
+                "html"
+              ],
+              "html": "<html lang=\"vi\">"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "critical": 0,
+        "serious": 2,
+        "moderate": 1,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Hộp thoại (Dialog, /dev/ui)",
+      "url": "http://localhost:5173/dev/ui",
+      "violations": [],
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Trang 404",
+      "url": "http://localhost:5173/khong-ton-tai",
+      "violations": [],
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      }
+    },
+    {
+      "state": "Trang 403",
+      "url": "http://localhost:5173/403",
+      "violations": [],
+      "counts": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "test_case": "TC-AUTH-01",
+  "status": "blocked",
+  "run_at": "2026-10-28T12:33:35.843Z",
+  "runner": "Claude Code (Playwright tự động)",
+  "mode": "mock",
+  "browser": "chromium (chromium)",
+  "login_ms": 397,
+  "steps": [
+    {
+      "n": 1,
+      "status": "passed",
+      "screenshot": "screenshots/01-login-page.png",
+      "note": "Chưa đăng nhập → chuyển tới http://localhost:5173/login?next=/c"
+    },
+    {
+      "n": 2,
+      "status": "passed",
+      "screenshot": "screenshots/02-form-filled.png",
+      "note": "Email đã điền; ô mật khẩu có type=password (hiển thị dạng che)"
+    },
+    {
+      "n": 3,
+      "status": "passed",
+      "screenshot": "screenshots/03-chat-opened.png",
+      "note": "Từ lúc bấm tới khi mở trang chat: 397 ms (ngưỡng ≤ 2000 ms). URL: http://localhost:5173/c"
+    },
+    {
+      "n": 4,
+      "status": "blocked",
+      "screenshot": "screenshots/04-after-reload.png",
+      "note": "BỊ CHẶN ở chế độ API giả: sau F5 bị đưa về http://localhost:5173/login?next=/c vì phiên giả nằm trong bộ nhớ JS, không phải lỗi ứng dụng. Cần chạy lại ở chế độ real (cookie sid)."
+    }
+  ],
+  "video": "video/TC-AUTH-01.webm",
+  "defects": []
+}
